@@ -1,0 +1,45 @@
+  
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+rtc_date_t	KEYWORD1
+timer_mode_t	KEYWORD1
+alarm_mode_t	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin		KEYWORD2
+setTime		KEYWORD2
+getTime		KEYWORD2
+setAlarm	KEYWORD2
+setAlarmMode	KEYWORD2
+controlAlarm	KEYWORD2
+setTimer	KEYWORD2
+setTimerMode	KEYWORD2
+controlTimer	KEYWORD2
+setClockOut	KEYWORD2
+setClockOutMode	KEYWORD2
+controlClockOut	KEYWORD2
+checkInterupt	KEYWORD2
+clearInterupt	KEYWORD2
+getRtcInfo	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+SUN		LITERAL1
+MON		LITERAL1
+TUE		LITERAL1
+WED		LITERAL1
+THU		LITERAL1
+FRI		LITERAL1
+SAT		LITERAL1
+EPSON8564NB	LITERAL1
+DS1307		LITERAL1
+DS3234		LITERAL1
+
