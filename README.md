@@ -25,6 +25,14 @@ APIの定義(RTC_U.h)はLGPLです．具体的な各RTCのライブラリは各�
 また，私自身はロジックアナライザ等は持っていないので，SPIやI2Cレベルでの動作が
 おかしい場合はデバッグできないので放置状態です．
 
+## 利用方法
+まず，このディレクトリをArduino開発環境のライブラリ用のディレクトリに置きます．
+次に，driverディレクトリの中から利用するRTC用のディレクトリも同じくライブラリ用ディレクトリに
+移動(もしくはコピー)します．
+
+以上で，準備はOKです．
+
+
 ## 外部リンク
 - Adafruit Unified Sensor Driver - [https://github.com/adafruit/Adafruit_Sensor][AdafruitUSD]
 - RTC-8564NB - [https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html][RTC8564NB]
