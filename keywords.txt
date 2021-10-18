@@ -26,6 +26,9 @@ controlClockOut	KEYWORD2
 checkInterupt	KEYWORD2
 clearInterupt	KEYWORD2
 getRtcInfo	KEYWORD2
+getWday		KEYWORD2
+convertDateToEpoch	KEYWORD2
+convertEpochTime	KEYWORD2
 
 
 #######################################

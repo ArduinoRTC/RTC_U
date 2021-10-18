@@ -47,6 +47,160 @@ Seeed is a hardware innovation platform for makers to grow inspirations into dif
 - Seeed studio RTC_DS1307 library [https://github.com/Seeed-Studio/RTC_DS1307][github]
 
 
+# API
+
+## オブジェクト生成
+```
+RTC_DS1307_U(TwoWire *theWire, int32_t rtcID = -1)
+```
+RTCが用いるI2CのI/FとIDを指定してオブジェクトを生成．
+|引数|内容|
+|---|---|
+|theWire|I2CのI/F|
+|rtCID|rtcに番号をつける場合に利用．(デフォルト値は-1)|
+
+## 初期化
+```
+bool  begin(uint32_t addr=RTC_DS1307_DEFAULT_I2C_ADDR)
+```
+DS1307のデフォルトI2Cのアドレスではない番号を持つモジュールを
+用いる場合は，引数で指定．指定しない場合は，デフォルトのアドレスで初期化を実施．
+
+| 返り値 | 意味 |
+|---|---|
+|true|初期化成功|
+|false|初期化失敗|
+
+## RTCの情報の取得
+RTCのチップの種類や機能の情報を取得するメンバ関数．
+```
+void  getRtcInfo(rtc_info_t *info)
+```
+
+## 時刻設定
+```
+bool  setTime(rtc_date_t* time)
+```
+引数で与えた時刻をRTCに設定．
+| 返り値 | 意味 |
+|---|---|
+|true|設定成功|
+|false|設定失敗|
+
+## 時刻取得
+```
+bool  getTime(rtc_date_t* time)
+```
+RTCから取得した時刻情報を引数で与えた構造体に格納．
+| 返り値 | 意味 |
+|---|---|
+|true|取得成功|
+|false|取得失敗|
+
+## クロック出力設定
+```
+int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1)
+```
+クロックが出力されているピン番号の設定と，周波数を設定．
+
+|``freq``の値|クロック周波数|
+|---|---|
+|0|1Hz|
+|1|4kHz|
+|2|8kHz|
+|3|32kHz|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## クロック周波数設定
+```
+int   setClockOutMode(uint8_t num, uint8_t freq)
+```
+クロックの周波数のみを設定．
+
+|``freq``の値|クロック周波数|
+|---|---|
+|0|4096Hz|
+|1|64Hz|
+|2|1秒|
+|3|1分|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## クロック出力の制御
+```
+int   controlClockOut(uint8_t num, uint8_t mode)
+```
+|``mode``の値|意味|
+|---|---|
+|0|クロック出力停止|
+|1|クロック出力開始|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## 利用を進めない機能(廃止予定)
+
+### クロック出力の開始
+```
+void  startClock(void)
+```
+
+### クロック出力の停止
+```
+void  stopClock(void)
+```
+
+
+## DS1307にない機能
+以下の関数はRTCに対応する機能がないので，-1(RTC_U_UNSUPPORTED)を返す．
+### アラーム設定
+```
+int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing)
+```
+### アラームモード設定
+```
+int   setAlarmMode(uint8_t num, alarm_mode_t * mode)
+```
+### アラーム制御
+```
+int   controlAlarm(uint8_t num, uint8_t action)
+```
+### タイマ設定
+```
+int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi)
+```
+### タイマのモード設定
+```
+int   setTimerMode(uint8_t num, timer_mode_t * mode)
+```
+### タイマの制御
+```
+int   controlTimer(uint8_t num, uint8_t action)
+```
+### 割り込みの確認
+```
+uint16_t   checkInterupt(void)
+```
+### 割り込みフラグの解除
+```
+bool  clearInterupt(uint16_t type)
+```
+
+
 
 [DS1307]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS1307.html
 [GroveRTC]:https://www.seeedstudio.com/Grove-RTC.html

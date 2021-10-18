@@ -187,15 +187,23 @@ int RTC_DS1307_U::setClockOutMode(uint8_t num, uint8_t freq) {
     case 4 : clockOutReg = RTC_DS1307_OFF;break;
     case 5 : clockOutReg = RTC_DS1307_ON;break;
   }
-  if (!writeReg(RTC_DS1307_REG_CLOCK_CONTROL,clockOutReg)) return -1;
+  if (!writeReg(RTC_DS1307_REG_CLOCK_CONTROL,clockOutReg)) return 1;
   return 0;
 }
 
 /*
- * クロック出力の制御 : このRTCは機能がないので-1を返す
+ * クロック出力の制御 : modeが0の時はclock出力をOFF, 1の時はclock出力をON
  */
 int  RTC_DS1307_U::controlClockOut(uint8_t num, uint8_t mode) {
-  return -1;
+  if (num >= RTC_DS1307_NUM_OF_CLOCKOUT) return -1;
+  byte clockOutReg;
+  switch(mode) {
+    case 0: clockOutReg = RTC_DS1307_OFF;break;
+    case 1: clockOutReg = RTC_DS1307_ON;break;
+    default: return -1;
+  }
+  if (!writeReg(RTC_DS1307_REG_CLOCK_CONTROL,clockOutReg)) return 1;
+  return 0;
 }
 
 uint8_t RTC_DS1307_U::decToBcd(uint8_t val)

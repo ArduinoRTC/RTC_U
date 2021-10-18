@@ -91,7 +91,7 @@ bool RTC_8564NB_U::setTime(rtc_date_t* date){
 int  RTC_8564NB_U::setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing) {
   if (num >= RTC_EPSON_8564NB_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
   if (0== SetAlarm(timing->hour, timing->minute, timing->mday, timing->wday) ) {
-    return RTC_U_SUCCESS;
+    if (RTC_U_SUCCESS==setAlarmMode(num, mode)) return RTC_U_SUCCESS;
   }
   return RTC_U_FAILURE;
 }

@@ -75,6 +75,7 @@ int  RTC_DS3234_U::setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing
   uint8_t pinModeVal=0;
   if (mode->useInteruptPin == 1) pinModeVal=1;
   wday = timing->wday;
+  if (wday == 7) wday=8;
   if (wday == 0) wday=7;
   bool use_wday=true;
   if (timing->mday >31) {
@@ -153,12 +154,13 @@ int  RTC_DS3234_U::setAlarmMode(uint8_t num, alarm_mode_t * mode) {
  * アラームの動作変更(start/stop/resumeなど)
  * タイマコントールレジスタ(アドレス0x0E)のTEビット(最上位ビット)で制御
  * 0 : 成功(RTC_U_SUCCESS)
- * 2 : 未知のアクション
+ * 2 : 未知のアクション (未使用)
  * -1 : 存在しないアラームを制御しようとした．
  * 【注意事項】停止したアラームを再度有効にする際は，再セットアップが必要
  */
 int  RTC_DS3234_U::controlAlarm(uint8_t num, uint8_t action) {
-  if (action != 0 ) return 2;
+  //if (action != 0 ) return 2;
+  if (action != 0 ) return RTC_U_UNSUPPORTED;
   if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
   if (num == 0 ) {
     _ds3234.controlAlarmInterrupt(0, -1);

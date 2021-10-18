@@ -23,11 +23,223 @@
 |ESP32 | [ESPr one 32][ESPrOne32] | [スイッチサイエンス][SwitchScience] |○|割り込みピンはD13を利用|
 
 
+## サンプルプログラム
+
+- RTC_8564NB_U
+  - 8564NBの内部タイマでの割り込み機能を用いて，コールバック関数を呼び出すサンプルプログラム
+- RTC_8564NB_U_settime
+  - NTPもしくは，プログラム上の定数(固定値)でRTCに時刻を設定するサンプルプログラム
 
 ## 外部リンク
 - RTC-8564NB - [https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html][RTC8564NB]
 - 秋月電子8564NB搭載モジュール - [http://akizukidenshi.com/catalog/g/gI-00233/][AkizukiRTC8564NB]
 - オリジナルプログラム - [http://zattouka.net/GarageHouse/micon/Arduino/RTC/RTC.htm][original]
+
+
+# API
+
+## オブジェクト生成
+```
+RTC_8564NB_U(TwoWire * theWire, int32_t rtcID=-1)
+```
+RTCが用いるI2CのI/FとIDを指定してオブジェクトを生成．
+|引数|内容|
+|---|---|
+|theWire|I2CのI/F|
+|rtcID|rtcに番号をつける場合に利用．(デフォルト値は-1)|
+
+## 初期化
+```
+bool  begin(uint32_t addr=RTC_EPSON_8564NB_DEFAULT_ADRS)
+```
+EPSON　8564NBのデフォルトI2Cのアドレスではない番号を持つモジュールを
+用いる場合は，引数で指定．指定しない場合は，デフォルトのアドレスで初期化を実施．
+
+| 返り値 | 意味 |
+|---|---|
+|true|初期化成功|
+|false|初期化失敗|
+
+## RTCの情報の取得
+RTCのチップの種類や機能の情報を取得するメンバ関数．
+```
+void  getRtcInfo(rtc_info_t *info)
+```
+
+## 時刻設定
+```
+bool  setTime(rtc_date_t* time)
+```
+引数で与えた時刻をRTCに設定．
+| 返り値 | 意味 |
+|---|---|
+|true|設定成功|
+|false|設定失敗|
+
+## 時刻取得
+```
+bool  getTime(rtc_date_t* time)
+```
+RTCから取得した時刻情報を引数で与えた構造体に格納．
+| 返り値 | 意味 |
+|---|---|
+|true|取得成功|
+|false|取得失敗|
+
+## アラーム設定
+```
+int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing)
+```
+8564NBのアラームは，日付，曜日，時間，分を設定でき，それを第3引数で指定．モードは``setAlarmMode()``を参照．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## アラームモード設定
+```
+int   setAlarmMode(uint8_t num, alarm_mode_t * mode)
+```
+アラームが発生したタイミングでの割り込みピンの制御を行うか否かを設定する．
+``mode``の構造体メンバ``useInteruptPin``が0の場合は割り込みピンを制御せず，1の場合は制御する．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## アラーム制御
+```
+int   controlAlarm(uint8_t num, uint8_t action)
+```
+``action``を0に設定すると，アラームが停止する．それ以外の動作はサポートしていない．そのため，止めたアラームを再度有効にするためには，再度のセットアップが必要．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## タイマ設定
+```
+int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi)
+```
+第2引数modeの構造体メンバの意味は以下の通り．
+|構造体メンバ|0|1|2|3|
+|---|---|---|---|---|
+|``repeat``|リピートなし|リピートあり|||
+|``useInteruptPin``|割り込みピンの利用|割り込みピン不使用|||
+|``interval``|4096Hz|64Hz|1秒|1分|
+
+第3引数のmultiは第2引数の``interval``の周期の``multi``倍でタイマが発火する設定を行う．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## タイマのモード設定
+```
+int   setTimerMode(uint8_t num, timer_mode_t * mode)
+```
+第2引数は上の``setTimer()``と同じ．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## タイマの制御
+```
+int   controlTimer(uint8_t num, uint8_t action)
+```
+第2引数``action``の意味は以下の通り．
+
+|``action``の値|意味|
+|---|---|
+|0|タイマ停止|
+|1|タイマ再開|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## クロック出力設定
+```
+int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1)
+```
+クロックが出力されているピン番号の設定と，周波数を設定．
+|``freq``の値|クロック周波数|
+|---|---|
+|0|4096Hz|
+|1|64Hz|
+|2|1秒|
+|3|1分|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## クロック周波数設定
+```
+int   setClockOutMode(uint8_t num, uint8_t freq)
+```
+クロックの周波数のみを設定．
+
+|``freq``の値|クロック周波数|
+|---|---|
+|0|4096Hz|
+|1|64Hz|
+|2|1秒|
+|3|1分|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## クロック出力の制御
+```
+int   controlClockOut(uint8_t num, uint8_t mode)
+```
+|``mode``の値|意味|
+|---|---|
+|0|クロック出力停止|
+|1|クロック出力開始|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## 割り込みの確認
+```
+uint16_t   checkInterupt(void)
+```
+割り込みの有無を16bitの2進数の列として出力．どのbitが立っているかでどの割り込みが発生しているかを判定することができる．
+
+
+## 割り込みフラグの解除
+```
+bool  clearInterupt(uint16_t type)
+```
+``checkInterupt()``の出力と同じく，消すフラグをbit列の中で0として表記して与える．
+
+
+
 
 [RTC8564NB]:https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html
 [AkizukiRTC8564NB]:http://akizukidenshi.com/catalog/g/gI-00233/

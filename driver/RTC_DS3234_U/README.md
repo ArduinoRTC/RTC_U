@@ -93,6 +93,229 @@ Uno系統しか動きませんでした．レジスタを叩くところがお�
 - SparkFun DeadOn RTC Breakout DS3234 - [https://www.sparkfun.com/products/10160][BOB-10160]
 - SparkFun DeadOn RTC Breakout (DS3234) Arduino Library - [https://github.com/sparkfun/SparkFun_DS3234_RTC_Arduino_Library][github]
 
+
+
+# API
+
+## オブジェクト生成
+```
+RTC_DS3234_U(uint8_t cs, SPIClass *spi, int32_t rtcID=-1)
+```
+RTCが用いるI2CのI/FとIDを指定してオブジェクトを生成．
+|引数|内容|
+|---|---|
+|cs|チップセレクトのピン番号|
+|spi|SPI I/F|
+|rtcID|rtcに番号をつける場合に利用．(デフォルト値は-1)|
+
+```
+RTC_DS3234_U(uint8_t cs, uint8_t miso, uint8_t mosi, uint8_t sck, int32_t rtcID=-1)
+```
+RTCが用いるI2CのI/FとIDを指定してオブジェクトを生成．
+|引数|内容|
+|---|---|
+|cs|チップセレクトのピン番号|
+|mosi, miso, sck| SPI I/Fの各ピン番号|
+|rtcID|rtcに番号をつける場合に利用．(デフォルト値は-1)|
+
+## 初期化
+```
+bool  begin(void)
+```
+RTCの初期化．
+
+| 返り値 | 意味 |
+|---|---|
+|true|初期化成功|
+|false|初期化失敗|
+
+
+## RTCの情報の取得
+RTCのチップの種類や機能の情報を取得するメンバ関数．
+```
+void  getRtcInfo(rtc_info_t *info)
+```
+
+## 時刻設定
+```
+bool  setTime(rtc_date_t* time)
+```
+引数で与えた時刻をRTCに設定．
+| 返り値 | 意味 |
+|---|---|
+|true|設定成功|
+|false|設定失敗|
+
+## 時刻取得
+```
+bool  getTime(rtc_date_t* time)
+```
+RTCから取得した時刻情報を引数で与えた構造体に格納．
+| 返り値 | 意味 |
+|---|---|
+|true|取得成功|
+|false|取得失敗|
+
+
+## アラーム設定
+```
+int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing)
+```
+設定可能なアラームは，下の表に記載．
+
+| num   | timing->mday | timing->wday | アラーム設定内容 | 設定対象 |
+|---|---|---|---|---|
+|  0    |  0-31        |              | 日,時,分,秒 | アラーム1番 |
+|       | 32以上       | 0-6           | 曜日,時,分,秒 ||
+|       |              | 7以上         | 時,分,秒 ||
+| 0以外 |  0-31        |               | 日,時,分 | アラーム2番 |
+|       |  32以上      | 0-6           | 曜日,時,分 ||
+|       |              | 7以上         | 時,分 ||
+
+modeの構造体メンバuseInteruptPinが1の場合に割り込み信号が利用される設定となる．
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|1 (RTC_U_FAILURE) |設定失敗|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## アラームモード設定
+```
+int   setAlarmMode(uint8_t num, alarm_mode_t * mode)
+```
+
+``num``で指定したアラームに``mode``の構造体メンバ``useInteruptPin``で割り込みピンの使用/不使用を設定する．
+``useInteruptPin``が0の場合は割り込みピンを制御せず，1の場合は制御する．
+|num|設定対象|
+|---|---|
+|0 | アラーム1番|
+|1 | アラーム2番|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## アラーム制御
+```
+int   controlAlarm(uint8_t num, uint8_t action)
+```
+
+``num``で指定したアラームに``action``で割り込みピンの使用/不使用を設定する．
+``action``が0の場合は割り込みピンを制御せず，1の場合は制御する．
+|num|設定対象|
+|---|---|
+|0 | アラーム1番|
+|1 | アラーム2番|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## 割り込みの確認
+```
+uint16_t   checkInterupt(void)
+```
+このRTCはタイマ機能がないため，割り込みはアラームだけで発生する．
+
+| 返り値 | アラーム1番 | アラーム2番 |
+|---|---|---|
+|0| 割り込みなし | 割り込みなし | 
+|1| 割り込み発生 | 割り込みなし | 
+|2| 割り込みなし | 割り込み発生 |
+|3| 割り込み発生 | 割り込み発生 |
+
+## 割り込みフラグの解除
+```
+bool  clearInterupt(uint16_t type)
+```
+
+| type | アラーム1番 | アラーム2番 |
+|---|---|---|
+|0| フラグクリア | フラグクリア | 
+|1| フラグクリア | なにもしない | 
+|2| なにもしない | フラグクリア |
+|3| フラグクリア | フラグクリア |
+|その他| なにもしない |なにもしない |
+
+typeで4以上を指定するとなにもせず，結果はtrueで返ることに注意が必要．
+
+## クロック出力設定
+```
+int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1)
+```
+クロックが出力されているピン番号の設定と，周波数を設定．
+|``freq``の値|クロック周波数|
+|---|---|
+|0|1Hz|
+|1|1kHz|
+|2|4kHz|
+|3|8kHz|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+## クロック周波数設定
+```
+int   setClockOutMode(uint8_t num, uint8_t freq)
+```
+クロックの周波数のみを設定．
+
+|``freq``の値|クロック周波数|
+|---|---|
+|0|4096Hz|
+|1|64Hz|
+|2|1秒|
+|3|1分|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+## クロック出力の制御
+```
+int   controlClockOut(uint8_t num, uint8_t mode)
+```
+|``mode``の値|意味|
+|---|---|
+|0|クロック出力停止|
+|1|クロック出力開始|
+
+| 返り値 | 意味 |
+|---|---|
+|0 (RTC_U_SUCCESS) |設定成功|
+|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+
+
+
+
+## 未サポート機能
+RTCに機能がないため，以下の関数は未サポート．返り値は常に「-1 (RTC_U_UNSUPPORTED)」となる．
+### タイマ設定
+```
+int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi)
+```
+
+### タイマのモード設定
+```
+int   setTimerMode(uint8_t num, timer_mode_t * mode)
+```
+
+### タイマの制御
+```
+int   controlTimer(uint8_t num, uint8_t action)
+```
+
+
 [DS3234]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS3234.html
 [BOB-10160]:https://www.sparkfun.com/products/10160
 [github]:https://github.com/sparkfun/SparkFun_DS3234_RTC_Arduino_Library
