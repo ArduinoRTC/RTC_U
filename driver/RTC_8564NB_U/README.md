@@ -29,6 +29,8 @@
   - 8564NBの内部タイマでの割り込み機能を用いて，コールバック関数を呼び出すサンプルプログラム
 - RTC_8564NB_U_settime
   - NTPもしくは，プログラム上の定数(固定値)でRTCに時刻を設定するサンプルプログラム
+- RTC8564NBU_interval_sleep
+  - 8564NBの内部タイマでの割り込み機能を用いて，眠っているArduinoを起こすサンプルプログラム
 
 ## 外部リンク
 - RTC-8564NB - [https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html][RTC8564NB]
