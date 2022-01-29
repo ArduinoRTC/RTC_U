@@ -36,9 +36,9 @@ public:
   RTC_DS3234_U(uint8_t cs, SPIClass *spi, int32_t rtcID=-1);
   RTC_DS3234_U(uint8_t cs, uint8_t miso, uint8_t mosi, uint8_t sck, int32_t rtcID=-1);
   bool  begin(void);
-  bool  setTime(rtc_date_t*);
-  bool  getTime(rtc_date_t*);
-  int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing);
+  bool  setTime(date_t*);
+  bool  getTime(date_t*);
+  int   setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing);
   int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
   int   controlAlarm(uint8_t num, uint8_t action);
   int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi);

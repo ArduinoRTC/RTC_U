@@ -67,9 +67,9 @@ class RTC_8564NB_U : public RTC_Unified {
 public:
   RTC_8564NB_U(TwoWire * theWire, int32_t rtcID=-1);
   bool  begin(uint32_t addr=RTC_EPSON_8564NB_DEFAULT_ADRS);
-  bool  setTime(rtc_date_t*);
-  bool  getTime(rtc_date_t*);
-  int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing);
+  bool  setTime(date_t*);
+  bool  getTime(date_t*);
+  int   setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing);
   int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
   int   controlAlarm(uint8_t num, uint8_t action);
   int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi);

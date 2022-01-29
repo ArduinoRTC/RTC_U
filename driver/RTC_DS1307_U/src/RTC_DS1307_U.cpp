@@ -41,7 +41,7 @@ int RTC_DS1307_U::initRTC(void) {
   data = _i2c_if->read();
   data = _i2c_if->read();
   if (0 == data) { // 時刻が消えている
-    rtc_date_t data;
+    date_t data;
     data.year=RTC_DS1307_DEFAULT_YEAR;
     data.month=RTC_DS1307_DEFAULT_MONTH;
     data.mday=RTC_DS1307_DEFAULT_DAY;
@@ -57,7 +57,7 @@ int RTC_DS1307_U::initRTC(void) {
 
 /****************************************************************/
 /*Function: Read time and date from RTC */
-bool  RTC_DS1307_U::getTime(rtc_date_t*rst) {
+bool  RTC_DS1307_U::getTime(date_t*rst) {
   // Reset the register pointer
   _i2c_if->beginTransmission(_i2c_addr);
   _i2c_if->write((uint8_t)RTC_DS1307_REG_SECOND);
@@ -80,7 +80,7 @@ bool  RTC_DS1307_U::getTime(rtc_date_t*rst) {
 
 /*******************************************************************/
 /*Frunction: Write the time that includes the date to the RTC chip */
-bool RTC_DS1307_U::setTime(rtc_date_t *data) {
+bool RTC_DS1307_U::setTime(date_t *data) {
 #ifdef DEBUG
   Serial.println("try to set time data to registers ... done");
 #endif
@@ -111,7 +111,7 @@ bool RTC_DS1307_U::setTime(rtc_date_t *data) {
 /*
  * アラームの設定 : このRTCは機能がないので-1を返す
  */
-int  RTC_DS1307_U::setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing) {
+int  RTC_DS1307_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
   return -1;
 }
 

@@ -3,7 +3,6 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-rtc_date_t	KEYWORD1
 timer_mode_t	KEYWORD1
 alarm_mode_t	KEYWORD1
 
@@ -35,13 +34,6 @@ convertEpochTime	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-SUN		LITERAL1
-MON		LITERAL1
-TUE		LITERAL1
-WED		LITERAL1
-THU		LITERAL1
-FRI		LITERAL1
-SAT		LITERAL1
 EPSON8564NB	LITERAL1
 DS1307		LITERAL1
 DS3234		LITERAL1

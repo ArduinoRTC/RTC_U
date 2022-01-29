@@ -59,7 +59,7 @@ void setup()
   }
 
   /* 時刻データをRTCに登録するための変数定義 */
-  rtc_date_t date;
+  date_t date;
   date.year=2019;
   date.month=5;
   date.mday=22;
@@ -83,7 +83,7 @@ void setup()
 /*
  * RTCの時刻情報の表示
  */
-void printTime(rtc_date_t * date){
+void printTime(date_t * date){
   Serial.print(date->year);Serial.print("/");Serial.print(date->month);Serial.print("/");Serial.print(date->mday);Serial.print(" ");
   switch(date->wday) {
     case SUN : Serial.print("SUN");break;
@@ -107,7 +107,7 @@ void printTime(rtc_date_t * date){
  */
 void loop()
 {
-  rtc_date_t date;
+  date_t date;
   rtc.getTime(&date);
   printTime(&date);
   delay(1000) ;            // １秒後に繰り返す

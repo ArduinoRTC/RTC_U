@@ -72,7 +72,7 @@ void setup()
   }
 
   /* 時刻データをRTCに登録するための変数定義 */
-  rtc_date_t date;
+  date_t date;
   date.year=2019;
   date.month=5;
   date.mday=22;
@@ -95,7 +95,7 @@ void setup()
     alarm_mode_t alarm_mode;       // アラーム動作モード定義用変数
     alarm_mode.useInteruptPin=1;   // 割り込みピンを使う
 
-    rtc_date_t alarm_timing;       // アラーム発生時刻用変数
+    date_t alarm_timing;       // アラーム発生時刻用変数
     alarm_timing.hour=15;
     alarm_timing.minute=31;
     alarm_timing.mday=0xff;
@@ -142,7 +142,7 @@ void printInteruptFlag (uint16_t flag) {
 /*
  * RTCの時刻情報の表示
  */
-void printTime(rtc_date_t * date){
+void printTime(date_t * date){
   Serial.print(date->year);Serial.print("/");Serial.print(date->month);Serial.print("/");Serial.print(date->mday);Serial.print(" ");
   switch(date->wday) {
     case SUN : Serial.print("SUN");break;
@@ -166,7 +166,7 @@ void printTime(rtc_date_t * date){
  */
 void loop()
 {
-  rtc_date_t date;
+  date_t date;
   rtc.getTime(&date);
   printTime(&date);
 #ifdef INT_PIN

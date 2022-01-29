@@ -1,18 +1,34 @@
 
 #define USE_NTP
+#define USE_WIFI
+#define USE_WIFI_NINA
+
+
+#define WIFI_SSID "foo"
+#define WIFI_PASS "bar"
+
 
 #include "RTC_8564NB_U.h"
 
 #ifdef USE_NTP
+#ifdef USE_WIFI
+#ifdef USE_WIFI_NINA
+#include <WiFiNINA.h>
+#else /* USE_WIFI_NINA */
+#include <WiFi.h>
+#endif /* USE_WIFI_NINA */
+#include <WiFiUdp.h>
+#else /* USE_WIFI */
 #include <Ethernet.h>
 #include <EthernetUdp.h>
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xF0, 0x0D };
+#endif /* USE_WIFI */
+
 #include <NTPClient.h>
 
 /*
    ネットワーク関係の定数
 */
-//byte mac[] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }; //アドレスは手持ちのarduinoのものに変更すること
-byte mac[] = { 0x90, 0xa2, 0xda, 0x10, 0x11, 0x51 }; //アドレスは手持ちのarduinoのものに変更すること
 // DHCPでのアドレス取得失敗時の対策や，長時間経過後のアドレス再割当て等は対応していない
 boolean useDhcp = true;                             // 固定IPで運用する場合は false に変更
 
@@ -22,7 +38,16 @@ IPAddress dnsServer(192, 168, 0, 1);
 IPAddress gatewayAddress(192, 168, 0, 1);
 IPAddress netMask(255, 255, 255, 0);
 
+#ifdef USE_WIFI
+int status = WL_IDLE_STATUS;
+#endif /* USE_WIFI */
+
+#ifdef USE_WIFI
+WiFiUDP ntpUDP;
+#else /* USE_WIFI */
 EthernetUDP ntpUDP;
+#endif /* USE_WIFI */
+
 NTPClient timeClient(ntpUDP, 9 * 60 * 60); // JST
 #endif /* USE_NTP */
 
@@ -62,15 +87,6 @@ void printRtcInfo(rtc_info_t * rtcInfo) {
   }
 }
 
-#ifdef USE_NTP
-//
-// 本体をリセットする関数
-//
-void reboot() {
-  asm volatile ("  jmp 0");
-}
-#endif /* USE_NTP */
-
 /*
    電源起動時とリセットの時だけのみ処理される関数(初期化と設定処理)
 */
@@ -91,18 +107,41 @@ void setup()
     while (1) ;                                             // 処理中断
   }
   /* 時刻データをRTCに登録するための変数定義 */
-  rtc_date_t dateTime;
+  date_t dateTime;
 #ifdef USE_NTP
-  // MACアドレスとIPアドレスの設定
-  // 参考URL http://arduino.cc/en/Reference/EthernetBegin
-  if (useDhcp) {
-    if (Ethernet.begin(mac) == 0) {
-      reboot();
+#ifdef USE_WIFI
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present");
+    while (true) {
+      delay(1); // do nothing, no point running without Ethernet hardware
     }
-  } else {
-    Ethernet.begin(mac, ip, dnsServer, gatewayAddress, netMask);
-    Serial.println(F("ethernet setup done"));
   }
+  // attempt to connect to Wifi network:
+  while (status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(WIFI_SSID);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+    status = WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+    // wait 10 seconds for connection:
+    delay(10000);
+  }
+#else /* USE_WIFI */
+  Ethernet.begin(mac);
+  // Check for Ethernet hardware present
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+    while (true) {
+      delay(1); // do nothing, no point running without Ethernet hardware
+    }
+  }
+  if (Ethernet.linkStatus() == LinkOFF) {
+    Serial.println("Ethernet cable is not connected.");
+    while (true) {
+      delay(1); // do nothing, no point running without Ethernet hardware
+    }
+  }
+#endif /* USE_WIFI */
   Serial.println(F("network setup done"));
 #endif /* USE_NTP */
 
@@ -136,7 +175,7 @@ void setup()
 /*
    RTCの時刻情報の表示
 */
-void printTime(rtc_date_t * date) {
+void printTime(date_t * date) {
   Serial.print(date->year); Serial.print("/"); Serial.print(date->month); Serial.print("/"); Serial.print(date->mday); Serial.print(" ");
   switch (date->wday) {
     case SUN : Serial.print("SUN"); break;
@@ -160,7 +199,7 @@ void printTime(rtc_date_t * date) {
 */
 void loop()
 {
-  rtc_date_t dateTime;
+  date_t dateTime;
   unsigned long currentTime;
 
 #ifdef USE_NTP

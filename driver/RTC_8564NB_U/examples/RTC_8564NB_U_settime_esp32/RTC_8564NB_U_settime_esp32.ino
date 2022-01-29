@@ -3,8 +3,8 @@
 
 #include "RTC_8564NB_U.h"
 
-#define SSID_STR "houtbrion"
-#define WIFI_PASS "houtbrionhome"
+#define SSID_STR "foo"
+#define WIFI_PASS "bar"
 
 #ifdef USE_NTP
 #include <WiFi.h>
@@ -93,7 +93,7 @@ void setup()
     while (1) ;                                             // 処理中断
   }
   /* 時刻データをRTCに登録するための変数定義 */
-  rtc_date_t dateTime;
+  date_t dateTime;
 #ifdef USE_NTP
   // MACアドレスとIPアドレスの設定
   // 参考URL http://arduino.cc/en/Reference/EthernetBegin
@@ -145,7 +145,7 @@ void setup()
 /*
    RTCの時刻情報の表示
 */
-void printTime(rtc_date_t * date) {
+void printTime(date_t * date) {
   Serial.print(date->year); Serial.print("/"); Serial.print(date->month); Serial.print("/"); Serial.print(date->mday); Serial.print(" ");
   switch (date->wday) {
     case SUN : Serial.print("SUN"); break;
@@ -169,7 +169,7 @@ void printTime(rtc_date_t * date) {
 */
 void loop()
 {
-  rtc_date_t dateTime;
+  date_t dateTime;
   unsigned long currentTime;
 
 #ifdef USE_NTP

@@ -30,8 +30,9 @@
 次に，driverディレクトリの中から利用するRTC用のディレクトリも同じくライブラリ用ディレクトリに
 移動(もしくはコピー)します．
 
-以上で，準備はOKです．
+[dateUtilsライブラリ](https://github.com/houtbrion/dateUtils)をインストールしてください．
 
+以上で，準備はOKです．
 
 ## 5. 外部リンク
 - Adafruit Unified Sensor Driver - [https://github.com/adafruit/Adafruit_Sensor][AdafruitUSD]
@@ -45,22 +46,7 @@
 # APIマニュアル
 
 ## 1. 構造体定義など
-### 1.1. 時刻用構造体
-```
-typedef struct  {
-    uint16_t    year;           // 年
-    uint8_t     month;          // 月
-    uint8_t     mday;           // 日
-    uint8_t     wday;           // 曜日 (日曜が0で土曜が6)
-    uint8_t     hour;           // 時
-    uint8_t     minute;         // 分
-    uint8_t     second;         // 秒
-    int16_t     millisecond;    // ミリ秒 (ミリ秒の機能があるRTCのみで利用)
-} rtc_date_t;
-```
-
-
-### 1.2. RTCの機能を格納する構造体
+### 1.1. RTCの機能を格納する構造体
 ```
 typedef struct {
     uint32_t    type;                   // チップの種類
@@ -75,7 +61,7 @@ typedef struct {
 } rtc_info_t;
 ```
 
-### 1.3. タイマの動作モード
+### 1.2. タイマの動作モード
 ```
 typedef struct {
     int8_t  repeat;
@@ -84,14 +70,14 @@ typedef struct {
 } timer_mode_t;
 ```
 
-### 1.4. アラームの動作モード
+### 1.3. アラームの動作モード
 ```
 typedef struct {
     int8_t  useInteruptPin;
 } alarm_mode_t;
 ```
 
-### 1.5. RTCの種類
+### 1.4. RTCの種類
 ```
 enum {
     EPSON8564NB  = 1,
@@ -100,19 +86,33 @@ enum {
 };
 ```
 
-### 1.6. 曜日
+### 1.5 dateUtils.hのデータ型等
+本ライブラリで利用する「dateUtils.h」のデータ型は以下の通り．
+
 ```
 enum {
-    SUN = 0,
-    MON = 1,
-    TUE = 2,
-    WED = 3,
-    THU = 4,
-    FRI = 5,
-    SAT = 6
+  SUN = 0,
+  MON = 1,
+  TUE = 2,
+  WED = 3,
+  THU = 4,
+  FRI = 5,
+  SAT = 6
 };
 ```
 
+```
+typedef struct  {
+  uint16_t  year;
+  uint8_t   month;
+  uint8_t   mday;
+  uint8_t   wday;
+  uint8_t   hour;
+  uint8_t   minute;
+  uint8_t   second;
+  int16_t   millisecond;
+} date_t;
+```
 
 ## 2. メンバ関数
 
@@ -137,7 +137,7 @@ bool begin()
 ### 2.2. 時刻設定
 引数で与えられた時刻をRTCに設定する．
 ```
-bool        setTime(rtc_date_t* time)
+bool        setTime(date_t* time)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -147,7 +147,7 @@ bool        setTime(rtc_date_t* time)
 ### 2.3. 時刻取得
 引数で与えた構造体に，RTCから取得した時刻情報を書き込む．
 ```
-bool        getTime(rtc_date_t* time)
+bool        getTime(date_t* time)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -158,7 +158,7 @@ bool        getTime(rtc_date_t* time)
 
 numで指定した番号のアラームを発行する時刻(timing)とアラームの動作モード(mode)を設定．modeの値や意味はRTCによって異なるため，詳細は各ドライバを参照．
 ```
-int         setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing)
+int         setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -267,12 +267,12 @@ bool        clearInterupt(uint16_t type)
 ### 2.8. ユーティリティ関数
 UNIX時間(1970年元日からの秒数)を第2引数に与えると，第一引数の構造体に西暦の年月日，時刻を返す関数．
 ```
-void                convertEpochTime(rtc_date_t * dateTime , unsigned long epochTime)
+void                convertEpochTime(date_t * dateTime , unsigned long epochTime)
 ```
 
 引数で時刻を与えると，UNIX時間を返り値として返す．引数で1970/1/1以前の時刻を指定した場合は0が返る．
 ```
-unsigned long       convertDateToEpoch(rtc_date_t dateTime)
+unsigned long       convertDateToEpoch(date_t dateTime)
 ```
 
 引数で曜日に相当する整数を与えると，Sun, Monといった曜日の文字列を返す．引数が0の時に，返り値は"Sun"，1で"Mon"となる．

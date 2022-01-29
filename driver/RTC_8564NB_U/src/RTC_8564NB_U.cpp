@@ -48,7 +48,7 @@ bool RTC_8564NB_U::begin(uint32_t addr){
 }
 
 
-bool RTC_8564NB_U::getTime(rtc_date_t* rst){
+bool RTC_8564NB_U::getTime(date_t* rst){
   byte tm[7];
   rTime(tm);
   rst->year      = bcd2bin(tm[6]) + 2000;
@@ -62,7 +62,7 @@ bool RTC_8564NB_U::getTime(rtc_date_t* rst){
   return true;
 }
 
-bool RTC_8564NB_U::setTime(rtc_date_t* date){
+bool RTC_8564NB_U::setTime(date_t* date){
   byte year=(byte) (date->year - 2000);
 #ifdef DEBUG
   Serial.print(year);Serial.print("/");Serial.print(date->month);Serial.print("/");Serial.print(date->mday);Serial.print(" ");
@@ -88,7 +88,7 @@ bool RTC_8564NB_U::setTime(rtc_date_t* date){
 /*
  * アラームの設定
  */
-int  RTC_8564NB_U::setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing) {
+int  RTC_8564NB_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
   if (num >= RTC_EPSON_8564NB_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
   if (0== SetAlarm(timing->hour, timing->minute, timing->mday, timing->wday) ) {
     if (RTC_U_SUCCESS==setAlarmMode(num, mode)) return RTC_U_SUCCESS;

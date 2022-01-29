@@ -43,7 +43,7 @@ bool RTC_DS3234_U::begin(void){
 }
 
 
-bool RTC_DS3234_U::getTime(rtc_date_t* rst){
+bool RTC_DS3234_U::getTime(date_t* rst){
   _ds3234.update();
   rst->year      = _ds3234.getYear() + 2000;
   rst->month     = _ds3234.getMonth();
@@ -57,7 +57,7 @@ bool RTC_DS3234_U::getTime(rtc_date_t* rst){
   return true;
 }
 
-bool RTC_DS3234_U::setTime(rtc_date_t* date){
+bool RTC_DS3234_U::setTime(date_t* date){
   uint8_t year=(uint8_t) (date->year - 2000);
   uint8_t tmp=date->wday;
   if (tmp==0) tmp=7;
@@ -69,7 +69,7 @@ bool RTC_DS3234_U::setTime(rtc_date_t* date){
  * アラームの設定
  * ベースとなるsparkfunのドライバが設定の成功/失敗を返さないため，常時成功(RTC_U_SUCCESS)を返す．
  */
-int  RTC_DS3234_U::setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing) {
+int  RTC_DS3234_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
   if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
   uint8_t day, hour, min, sec, wday;
   uint8_t pinModeVal=0;

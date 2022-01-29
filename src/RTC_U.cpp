@@ -7,14 +7,11 @@
  */
 
 #define ARRAYSIZE(_arr) (sizeof(_arr) / sizeof(_arr[0]))
-#define SECONDS_IN_A_DAY    86400 // (24*60*60)
-#define EPOCH_DAY           719468    //(1969*365L + 1969/4 - 1969/100 + 1969/400 + 306)    //  days from 0000/03/01 to 1970/01/01
-#define UNIX_EPOCH_DAY      EPOCH_DAY
 #define YEAR_ONE            365
 #define YEAR_FOUR           1461  // (YEAR_ONE * 4 + 1)  //  it is YEAR_ONE*4+1 so the maximum reminder of day / YEAR_FOUR is YEAR_ONE * 4 and it occurs only on 2/29
 #define YEAR_100            36524  // (YEAR_FOUR * 25 - 1)
 #define YEAR_400            146097  // (YEAR_100*4 + 1)    //  it is YEAR_100*4+1 so the maximum reminder of day / YEAR_400 is YEAR_100 * 4 and it occurs only on 2/29
-void RTC_Unified::convertEpochTime(rtc_date_t * date, unsigned long unixtime) {
+void RTC_Unified::convertEpochTime(date_t * date, unsigned long unixtime) {
     uint32_t    unixday;
     uint16_t    year = 0;
     uint8_t     leap = 0;
@@ -103,7 +100,7 @@ unsigned int RTC_Unified::getDays(uint16_t year) {
 	return result;
 }
 
-unsigned long RTC_Unified::convertDateToEpoch(rtc_date_t dateTime){
+unsigned long RTC_Unified::convertDateToEpoch(date_t dateTime){
 	const unsigned int monthDays[13]={
 			0,31,59,90,120,151,181,212,243,273,304,334,365
 	};/*その月までの日数の和（累積和）*/
