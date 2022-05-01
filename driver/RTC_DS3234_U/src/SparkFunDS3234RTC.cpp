@@ -781,7 +781,8 @@ void SparkFun_DS3234::spiReadBytes(DS3234_registers reg, uint8_t * dest, uint8_t
   	_spi->transfer(reg);
 	  for (int i=0; i<len; i++)
   	{
-	  	dest[i] = SPI.transfer(0x00);
+	  	//dest[i] = SPI.transfer(0x00);
+      dest[i] = _spi->transfer(0x00);
 	  }
   	digitalWrite(_cs, HIGH);
 	  _spi->endTransaction();

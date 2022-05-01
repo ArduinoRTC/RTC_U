@@ -4,40 +4,19 @@
 [Grove RTC][GroveRTC]にも搭載されている[DS1307][DS1307]用の
 ライブラリ(デバイスドライバ)です．
 
-ベースにしたライブラリは，Grove RTC用の[https://github.com/Seeed-Studio/RTC_DS1307][github]です．
-
-
-## ライセンスについて
-ベースにしたプログラムのライセンスは，MITとなっているので，それを継承します．なお，原作のライセンス文を
-以下に引用しておきます．
-
-### 原作のライセンス文
-This software is written by Frankie Chu for seeed studio
-and is licensed under The MIT License. Check License.txt for more information.
-
-Contributing to this software is warmly welcomed. You can do this basically by
-forking, committing modifications and then pulling requests (follow the links above
-for operating guide). Adding change log and your contact into file header is encouraged.
-Thanks for your contribution.
-
-Seeed is a hardware innovation platform for makers to grow inspirations into differentiating products. By working closely with technology providers of all scale, Seeed provides accessible technologies with quality, speed and supply chain knowledge. When prototypes are ready to iterate, Seeed helps productize 1 to 1,000 pcs using in-house engineering, supply chain management and agile manufacture forces. Seeed also team up with incubators, Chinese tech ecosystem, investors and distribution channels to portal Maker startups beyond.
+以前はGrove RTC用の[https://github.com/Seeed-Studio/RTC_DS1307][github]のラッパのような実装になっていましたが，完全独自にしました．
 
 
 ## 動作検証
-動作検証に利用した[Grove RTC][GroveRTC]が5V専用であるため，VDDが5Vの
-機種のみ検証しました．
+秋月電子の[ＤＳ１３０７使用リアルタイムクロック（ＲＴＣ）モジュールキット][https://akizukidenshi.com/catalog/g/gK-15488/]を使いました．
 
-|CPU| 機種 |ベンダ| 結果 | 備考 |
-| :--- | :--- | :--- | :---: | :--- |
-|AVR| [Uno R3][Uno]  |[Arduino][Arduino]|   ○   |      |
-|       | [Mega2560 R3][Mega] |[Arduino][Arduino] |  ○    |      |
-|       | [Leonardo Ethernet][LeonardoEth] |[Arduino][Arduino] |   ○  |      |
-|       | [Uno WiFi][UnoWiFi] |[Arduino][Arduino] |    ○  | |
-|       | [Pro mini 3.3V][ProMini] | [Sparkfun][Sparkfun] |      |      |
-| ARM/M0+ | [M0 Pro][M0Pro] |[Arduino][Arduino] |||
-|ESP8266|[ESPr developer][ESPrDev]| [スイッチサイエンス][SwitchScience] |||
-|ESP32 | [ESPr one 32][ESPrOne32] | [スイッチサイエンス][SwitchScience] ||　|
-
+以下の表の機種で動作を確認しています．
+| CPU | 機種 | 対応状況 |
+|---|---|---|
+| AVR | Arduino Mega | ○ |
+| SAMD | Arduino MKR WiFi1010 | ○ |
+| SAM | Arduino Due | ○ |
+| ESP32 | スイッチサイエンスESP developer32 | ○ |
 
 
 ## 外部リンク
@@ -47,9 +26,36 @@ Seeed is a hardware innovation platform for makers to grow inspirations into dif
 - Seeed studio RTC_DS1307 library [https://github.com/Seeed-Studio/RTC_DS1307][github]
 
 
-# API
+## 利用上の注意
 
-## オブジェクト生成
+``RTC_DS1307_U.h``に以下のようなデバッグや性能テストに用いるための機能を生かすフラグがあります．
+必要に応じて有効・無効を変更してください．
+```
+#define DEBUG
+```
+
+## サンプルプログラム
+サンプルプログラムは，本ドライバの各機能を実行した場合に，RTCの各レジスタが適切に設定されているか否かを
+確認するためのものです．
+
+``RTC_DS1307_U.h``の``DEBUG``定義を有効にした上で
+コンパイルとインストールをしてください．
+
+以下の行を無効にすることで，詳細なメッセージとレジスタの内容の確認が実行されます．
+```
+#undef DEBUG 
+```
+
+以下の行を有効にすると，各テストでレジスタの書き換えが行われた後に，全レジスタの内容をダンプします．
+```
+#define DUMP_REGISTER  // レジスタの値を書き換えた後に，レジスタ値のdumpを見たい場合はこれを有効にする(DEBUGも有効にする)
+```
+
+
+# API
+maximのデータシートを合わせて読んでください．
+## 初期化
+### オブジェクト生成
 ```
 RTC_DS1307_U(TwoWire *theWire, int32_t rtcID = -1)
 ```
@@ -59,12 +65,15 @@ RTCが用いるI2CのI/FとIDを指定してオブジェクトを生成．
 |theWire|I2CのI/F|
 |rtCID|rtcに番号をつける場合に利用．(デフォルト値は-1)|
 
-## 初期化
+
+### 初期化
 ```
-bool  begin(uint32_t addr=RTC_DS1307_DEFAULT_I2C_ADDR)
+bool  begin(bool init, uint32_t addr=RTC_DS1307_DEFAULT_I2C_ADDR)
 ```
+第1引数は，時刻やタイマ，アラームの設定を実施するか否かを示すフラグで``false``の場合はI2Cまわりの初期化しかしません．
+
 DS1307のデフォルトI2Cのアドレスではない番号を持つモジュールを
-用いる場合は，引数で指定．指定しない場合は，デフォルトのアドレスで初期化を実施．
+用いる場合は，第2引数で指定．指定しない場合は，デフォルトのアドレスで初期化を実施．
 
 | 返り値 | 意味 |
 |---|---|
@@ -77,9 +86,10 @@ RTCのチップの種類や機能の情報を取得するメンバ関数．
 void  getRtcInfo(rtc_info_t *info)
 ```
 
-## 時刻設定
+## 時刻関係
+### 時刻設定
 ```
-bool  setTime(rtc_date_t* time)
+bool  setTime(date_t* time)
 ```
 引数で与えた時刻をRTCに設定．
 | 返り値 | 意味 |
@@ -87,9 +97,9 @@ bool  setTime(rtc_date_t* time)
 |true|設定成功|
 |false|設定失敗|
 
-## 時刻取得
+### 時刻取得
 ```
-bool  getTime(rtc_date_t* time)
+bool  getTime(date_t* time)
 ```
 RTCから取得した時刻情報を引数で与えた構造体に格納．
 | 返り値 | 意味 |
@@ -97,11 +107,16 @@ RTCから取得した時刻情報を引数で与えた構造体に格納．
 |true|取得成功|
 |false|取得失敗|
 
-## クロック出力設定
+## 周波数信号出力関係
+DS1307は周波数信号を出力する端子/機能は1つしかないので，以下の関数の第1引数の値は0限定です．
+### 出力設定
 ```
 int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1)
 ```
-クロックが出力されているピン番号の設定と，周波数を設定．
+
+DS1307は周期信号の出力を外部からの信号入力で制御する機能はないため，第3引数は無視されます．
+
+第2引数の値は以下の表の通りとなります．
 
 |``freq``の値|クロック周波数|
 |---|---|
@@ -112,16 +127,18 @@ int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1)
 
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_UNSUPPORTED |サポートしていないパラメータの設定など|
 
-## クロック周波数設定
+### クロック周波数設定
 ```
 int   setClockOutMode(uint8_t num, uint8_t freq)
 ```
-クロックの周波数のみを設定．
+``setClockOut()``の第3引数の``pin``以外は同じであり，``setClockOut()``では``pin``が無視されるため，
+``setClockOut()``と同じ動作を行います．
 
+第2引数は``setClockOut()``と同じく下の表の通りです．
 |``freq``の値|クロック周波数|
 |---|---|
 |0|4096Hz|
@@ -131,12 +148,12 @@ int   setClockOutMode(uint8_t num, uint8_t freq)
 
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_UNSUPPORTED |サポートしていないパラメータの設定など|
 
 
-## クロック出力の制御
+### クロック出力の制御
 ```
 int   controlClockOut(uint8_t num, uint8_t mode)
 ```
@@ -147,60 +164,50 @@ int   controlClockOut(uint8_t num, uint8_t mode)
 
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないパラメータの設定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_UNSUPPORTED |サポートしていないパラメータの設定など|
 
+## 計時用クロックの停止/再開
+本RTCは，消費電力削減用に時刻のカウントアップを停止/再開する機能があります．(レジスタ番号00hの最上位bit``CH``)
 
-## 利用を進めない機能(廃止予定)
+### クロックの状態の参照
+```
+int   clockHaltStatus(void)
+```
+電源電圧降下(電源断)や人為的に計時を止めたか否かを確認できます．
 
-### クロック出力の開始
-```
-void  startClock(void)
-```
+|返り値|意味|
+|---|---|
+|0|クロックは動作している|
+|1|クロックは止まっている|
+|RTC_U_FAILURE|レジスタ読み出し失敗|
 
-### クロック出力の停止
+### 計時用クロックの制御
 ```
-void  stopClock(void)
+int   controlClockHalt(uint8_t mode)
 ```
+計時のクロック動作を止める/再開する関数．
 
+|``mode``の値 | 意味|
+|---|---|
+|0 |クロック停止|
+|1 |クロック再開|
 
-## DS1307にない機能
-以下の関数はRTCに対応する機能がないので，-1(RTC_U_UNSUPPORTED)を返す．
-### アラーム設定
-```
-int   setAlarm(uint8_t num, alarm_mode_t * mode, rtc_date_t* timing)
-```
-### アラームモード設定
-```
-int   setAlarmMode(uint8_t num, alarm_mode_t * mode)
-```
-### アラーム制御
-```
-int   controlAlarm(uint8_t num, uint8_t action)
-```
-### タイマ設定
-```
-int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi)
-```
-### タイマのモード設定
-```
-int   setTimerMode(uint8_t num, timer_mode_t * mode)
-```
-### タイマの制御
-```
-int   controlTimer(uint8_t num, uint8_t action)
-```
-### 割り込みの確認
-```
-uint16_t   checkInterupt(void)
-```
-### 割り込みフラグの解除
-```
-bool  clearInterupt(uint16_t type)
-```
+| 返り値 | 意味 |
+|---|---|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
 
+## 未サポート機能
+DS1307には以下の機能がありませんので，以下の機能に関連する関数は何もせずに，``RTC_U_UNSUPPORTED``を返します．
 
+- アラーム
+- タイマ
+- 温度による時刻の補正
+- 時刻補正のための周波数の調整
+- アラームやタイマで発生した割り込み信号用端子関連
+- 電源電圧低下や電源喪失(電池で動作したか否か)に関する機能
 
 [DS1307]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS1307.html
 [GroveRTC]:https://www.seeedstudio.com/Grove-RTC.html

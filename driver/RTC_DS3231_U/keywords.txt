@@ -1,0 +1,25 @@
+  
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+RTC_DS3231_U	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+
+RTC_DS3231_DEFAULT_I2C_ADDR	LITERAL1
+RTC_DS3231_NUM_OF_INTERUPT_PIN	LITERAL1
+RTC_DS3231_NUM_OF_ALARM		LITERAL1
+RTC_DS3231_NUM_OF_TIMER		LITERAL1
+RTC_DS3231_NUM_OF_CLOCKOUT	LITERAL1
+RTC_DS3231_NUM_OF_YEAR_DIGITS	LITERAL1
+RTC_DS3231_HAVE_CENTURY_BIT	LITERAL1
+RTC_DS3231_HAVE_MILLISEC	LITERAL1
+RTC_DS3231_DETECT_LOW_BATTERY	LITERAL1
+RTC_DS3231_OSCILLATOR_CONTROL	LITERAL1

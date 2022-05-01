@@ -120,7 +120,7 @@ public:
 	////////////////////
 	// Constructor -- Initialize class variables to 0
 	SparkFun_DS3234(uint8_t cs, uint8_t mosi, uint8_t miso, uint8_t sck);
-  SparkFun_DS3234(uint8_t cs, SPIClass *spi);
+	SparkFun_DS3234(uint8_t cs, SPIClass *spi);
 	// Begin -- Initialize SPI interface, and sets up the chip-select pin
 	void begin(void);
 	
@@ -199,7 +199,7 @@ public:
 	// The SQW pin can be used as an interrupt. It is active-low, and can be
 	// set to trigger on alarm 1 and/or alarm 2:
 	void enableAlarmInterrupt(bool alarm1 = true, bool alarm2 = true);
-  void controlAlarmInterrupt(int alarm1 = -1, int alarm2 = -1);
+	void controlAlarmInterrupt(int alarm1 = -1, int alarm2 = -1);
 	
 	// alarm1 and alarm2 check their respective flag in the control/status
 	// register. They return true if the flag is set.
@@ -226,9 +226,9 @@ public:
 	uint8_t readFromSRAM(uint8_t address);
 	
 	void writeToRegister(DS3234_registers address, uint8_t data);
-  uint8_t readFromRegister(DS3234_registers address);
+	uint8_t readFromRegister(DS3234_registers address);
 
-  bool validateTimeData(void);
+	bool validateTimeData(void);
 	
 private:
   SPIClass * _spi;

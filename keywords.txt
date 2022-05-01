@@ -1,40 +1,95 @@
-  
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-timer_mode_t	KEYWORD1
-alarm_mode_t	KEYWORD1
+timer_mode_t		KEYWORD1
+alarm_mode_t		KEYWORD1
+event_mode_t		KEYWORD1
+rtc_info_t		KEYWORD1
+RTC_Unified     	KEYWORD1
 
+pulse			KEYWORD1
+repeat			KEYWORD1
+useInteruptPin		KEYWORD1
+interval		KEYWORD1
+type			KEYWORD1
+
+capture			KEYWORD1
+level			KEYWORD1
+filter			KEYWORD1
+reset			KEYWORD1
+numOfInteruptPin	KEYWORD1
+numOfAlarm		KEYWORD1
+numOfTimer		KEYWORD1
+numOfClockOut		KEYWORD1
+numOfYearDigits		KEYWORD1
+haveYearOverflowBit	KEYWORD1
+haveMilliSec		KEYWORD1
+independentSQW		KEYWORD1
+detectLowBattery	KEYWORD1
+controlOscillator	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-begin		KEYWORD2
-setTime		KEYWORD2
-getTime		KEYWORD2
-setAlarm	KEYWORD2
-setAlarmMode	KEYWORD2
-controlAlarm	KEYWORD2
-setTimer	KEYWORD2
-setTimerMode	KEYWORD2
-controlTimer	KEYWORD2
-setClockOut	KEYWORD2
-setClockOutMode	KEYWORD2
-controlClockOut	KEYWORD2
-checkInterupt	KEYWORD2
-clearInterupt	KEYWORD2
-getRtcInfo	KEYWORD2
-getWday		KEYWORD2
-convertDateToEpoch	KEYWORD2
-convertEpochTime	KEYWORD2
-
+setTime				KEYWORD2
+getTime				KEYWORD2
+setAlarm			KEYWORD2
+setAlarmMode			KEYWORD2
+controlAlarm			KEYWORD2
+setTimer			KEYWORD2
+setTimerMode			KEYWORD2
+controlTimer			KEYWORD2
+setClockOut			KEYWORD2
+setClockOutMode			KEYWORD2
+controlClockOut			KEYWORD2
+checkInterupt			KEYWORD2
+clearInterupt			KEYWORD2
+getRtcInfo			KEYWORD2
+setOscillator			KEYWORD2
+getOscillator			KEYWORD2
+controlTemperatureFunction	KEYWORD2
+getTemperatureFunctionState	KEYWORD2
+setTemperatureFunction		KEYWORD2
+getTemperature			KEYWORD2
+clockHaltStatus			KEYWORD2
+controlClockHalt		KEYWORD2
+checkLowPower			KEYWORD2
+clearPowerFlag			KEYWORD2
+setLowPower			KEYWORD2
+controlClock			KEYWORD2
+setEvent			KEYWORD2
+getEvent			KEYWORD2
+convertEpochTime		KEYWORD2
+convertDateToEpoch		KEYWORD2
+getWday				KEYWORD2
+intToBCD			KEYWORD2
+bcdToInt			KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
-EPSON8564NB	LITERAL1
-DS1307		LITERAL1
-DS3234		LITERAL1
+RTC_U_UNSUPPORTED		LITERAL1
+RTC_U_SUCCESS			LITERAL1
+RTC_U_FAILURE			LITERAL1
+RTC_U_ILLEGAL_PARAM		LITERAL1
+
+RTC_U_TEMPERATURE_KELVIN	LITERAL1
+RTC_U_TEMPERATURE_CELCIUS	LITERAL1
+RTC_U_TEMPERATURE_FAHRENHEIT	LITERAL1
+RTC_U_TEMPERATURE_FAILURE	LITERAL1
+
+EPSON8564NB			LITERAL1
+EPSON_RX8025			LITERAL1
+EPSON_RX8900			LITERAL1
+EPSON_4543SA			LITERAL1
+DS1307				LITERAL1
+DS3231				LITERAL1
+DS3234				LITERAL1
+PCF8523				LITERAL1
+RV8803				LITERAL1
+
+
+
 

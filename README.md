@@ -81,8 +81,14 @@ typedef struct {
 ```
 enum {
     EPSON8564NB  = 1,
+    EPSON_RX8025,
+    EPSON_RX8900,
+    EPSON_4543SA,
     DS1307,
-    DS3234
+    DS3231,
+    DS3234,
+    PCF8523,
+    RV8803
 };
 ```
 
@@ -116,6 +122,8 @@ typedef struct  {
 
 ## 2. メンバ関数
 
+以下に説明するメンバ関数のうち，時刻の設定取得以外はRTCの種類によっては機能が存在しないものがあります．そのため，機能が存在しないRTCでその関数を呼び出した場合は引数等に関係なく，何もせずに``RTC_U_UNSUPPORTED``を返します．どのRTCにどの関数が存在しないかは各RTC用ドライバのREADME.mdを参照してください．
+
 ### 2.1. 全般
 
 RTCのチップの種類や機能の情報を取得するメンバ関数．
@@ -123,11 +131,12 @@ RTCのチップの種類や機能の情報を取得するメンバ関数．
 void  getRtcInfo(rtc_info_t *info)
 ```
 
-
 RTCの初期化関数で，引数はRTCの種類によって異なるため，具体的な内容は各ドライバを参照．
 ```
-bool begin()
+bool begin(bool init=true)
 ```
+引数にtrueを指定(デフォルト)の場合は時刻(初期値)を設定します．Arduinoが再起動した場合に以前設定しておいた時刻等が消えると問題がある場合は引数に``false``を指定してください．
+
 | 返り値 | 意味 |
 |---|---|
 |true|初期化成功|
@@ -135,7 +144,7 @@ bool begin()
 
 
 ### 2.2. 時刻設定
-引数で与えられた時刻をRTCに設定する．
+引数で与えられた時刻をRTCに設定する．なお，本ライブラリ(と各RTCのドライバ)は，12時間制(AM/PM)はサポートしていません．
 ```
 bool        setTime(date_t* time)
 ```
@@ -162,9 +171,9 @@ int         setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号等を指定している|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号等を指定している|
 
 
 numで指定した番号のアラームの動作モード(mode)を設定．modeの値や意味はRTCによって異なるため，詳細は各ドライバを参照．
@@ -173,9 +182,9 @@ int         setAlarmMode(uint8_t num, alarm_mode_t * mode)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号等を指定している|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号等を指定している|
 
 numで指定した番号のアラームを開始/停止/一時停止する関数．actionの意味や具体的な動作はRTCの種類によって異なるため，各ドライバを参照．
 ```
@@ -183,20 +192,20 @@ int         controlAlarm(uint8_t num, uint8_t action)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号等を指定している|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号等を指定している|
 
 ### 2.5. タイマ関係
 numで指定した番号のタイマの動作をmodeとmultiで設定．一般的には，modeで用いる周波数とmultiで何周期で発火するかを意味するが，RTCの書類によって異なるため，詳細は各ドライバを参照．
 ```
-int         setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi)
+int         setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号の指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号の指定など|
 
 numで指定した番号のタイマの動作modeを設定．モードの内容等はRTCの種類によって異なるため，各ドライバを参照．
 ```
@@ -204,9 +213,9 @@ int         setTimerMode(uint8_t num, timer_mode_t * mode)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号の指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号の指定など|
 
 numで指定した番号のタイマを開始/停止/一時停止する関数．actionの意味や具体的な動作はRTCの種類によって異なるため，各ドライバを参照．
 ```
@@ -214,9 +223,9 @@ int         controlTimer(uint8_t num, uint8_t action)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないアラーム番号の指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないアラーム番号の指定など|
 
 ### 2.6. クロック出力関係
 第3引数のピンに第2引数freqで指定した周波数の信号を出す．第1引数のnumは
@@ -225,9 +234,9 @@ int         setClockOut(uint8_t num, uint8_t freq, int8_t pin)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないクロックの指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないクロックの指定など|
 
 第1引数で指定したクロック出力設定の周波数を変更する関数．
 ```
@@ -235,9 +244,9 @@ int         setClockOutMode(uint8_t num, uint8_t freq)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないクロックの指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないクロックの指定など|
 
 第1引数で指定したクロック出力を制御(開始/停止)する関数．
 ```
@@ -245,26 +254,96 @@ int         controlClockOut(uint8_t num, uint8_t mode)
 ```
 | 返り値 | 意味 |
 |---|---|
-|0 (RTC_U_SUCCESS) |設定成功|
-|1 (RTC_U_FAILURE) |設定失敗|
-|-1 (RTC_U_UNSUPPORTED) |サポートしていないクロックの指定など|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないクロックの指定など|
 
 ### 2.7. 割り込み関係
 割り込みが発生しているか否かの検査で返り値が割り込み番号．返り値の内容はRTCの種類によって異なるため，各ドライバを参照．
 ```
-uint16_t    checkInterupt(void)
+int    checkInterupt(void)
 ```
 
 typeで指定したアラームやタイマの割り込みフラグを消す．typeの内容はRTCの種類によって異なるため，各ドライバを参照．
 ```
-bool        clearInterupt(uint16_t type)
+int        clearInterupt(uint16_t type)
+```
+
+| 返り値 | 意味 |
+|---|---|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |サポートしていないクロックの指定など|
+
+
+### 2.8 電源関係
+コンピュータ本体の電源が切断されても時刻を更新するための電池を接続する回路構成にすることが珍しくない．
+ただし，電池寿命等の関係で電池電圧が降下した場合にRTCがそれを記録し，次回コンピュータの電源が復帰した場合にRTCの
+電源電圧降下が発生したか否かを確認することができることが多い．
+
+この機能を装備したRTCでは電圧降下を示すRTC内のフラグ値の取得とそのフラグをクリアするため，以下の2種類の関数があります．
+
+```
+int   checkLowPower(void)
+
+```
+この関数は，電圧降下があったか否かを示すフラグ値を取得できます．RTCにその機能がない場合は``RTC_U_UNSUPPORTED``，取得に失敗した場合は``RTC_U_FAILURE``を返します．両方の値共に負の値なので，0以上の値が取得できた場合はフラグ値となります．このフラグ値の具体的な内容はRTCの種類によって異なるため，各RTC用ドライバのREADME.mdを参照してください．
+
+
+```
+int   clearPowerFlag(void)
+
+```
+この関数は電圧降下を監視するフラグ値をクリアするためのものです．
+RTCに電圧降下監視機能がない場合は``RTC_U_UNSUPPORTED``，フラグ値の書き込みに失敗した場合は``RTC_U_FAILURE``，書き込み成功時は``RTC_U_SUCCESS``を返します．
+
+```
+int setLowPower(uint8_t mode)
+```
+一部のRTCでは，電源低下の検出に関してパラメータを設定することができます．設定に成功すると``RTC_U_SUCCESS``，失敗した場合は``RTC_U_FAILURE``を返します．そもそもRTCに機能がない場合は``RTC_U_UNSUPPORTED``となります．
+
+
+### 2.9 計時の停止関係
+一部のRTCでは，消費電力低減のために時計の更新(クロック)を止める機能を持つものがあります．それに対応する以下のメンバ関数を用意しました．
+
+```
+int         controlClockHalt(uint8_t mode)
+```
+クロックを止める機能があるRTCで止める，再開するを制御します．
+
+|modeの値|意味|
+|---|---|
+|0| クロックを止める|
+|1| クロックを再開する|
+
+| 返り値 | 意味 |
+|---|---|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
+|RTC_U_ILLEGAL_PARAM |``mode``の値が不正|
+
+```
+int         clockHaltStatus(void);
+```
+この関数はクロックが止まっているか否かを示します．
+| 返り値 | 意味 |
+|---|---|
+|1|クロックは停止|
+|0|クロックは停止していない|
+|RTC_U_FAILURE |情報取得失敗|
+
+### 2.10 時刻調整
+一部のRTCでは，計時を止める以外の調整機能を持つものがあります．例えば，EPSON RX8900は秒以下のカウンタをクリア(リセット)することができます．このような機能を以下の関数にまとめてあります．RTCによって，その機能の有無や処理内容に違いがあるため，各RTCのREADME.mdを参照してください．
+```
+int controlClock(void)
 ```
 | 返り値 | 意味 |
 |---|---|
-|true|設定成功|
-|false|設定失敗|
+|RTC_U_SUCCESS |設定成功|
+|RTC_U_FAILURE |設定失敗|
 
-### 2.8. ユーティリティ関数
+
+### 2.11 ユーティリティ関数
 UNIX時間(1970年元日からの秒数)を第2引数に与えると，第一引数の構造体に西暦の年月日，時刻を返す関数．
 ```
 void                convertEpochTime(date_t * dateTime , unsigned long epochTime)
@@ -279,7 +358,6 @@ unsigned long       convertDateToEpoch(date_t dateTime)
 ```
 String              getWday(uint8_t day)
 ```
-
 
 [AdafruitUSD]:https://github.com/adafruit/Adafruit_Sensor
 [RTC8564NB]:https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html

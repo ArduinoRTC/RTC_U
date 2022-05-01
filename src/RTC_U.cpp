@@ -131,3 +131,17 @@ unsigned long RTC_Unified::convertDateToEpoch(date_t dateTime){
 	result+=(unsigned long) second;
 	return result;
 }
+
+uint8_t RTC_Unified::intToBCD(uint8_t data){
+    uint8_t lowBits,highBits;
+    lowBits = data % 10;
+    highBits = ((uint8_t) (data /10)) % 10;
+    return (highBits << 4) | lowBits;
+}
+
+uint8_t RTC_Unified::bcdToInt(uint8_t bcdData){
+    uint8_t lowBits, highBits;
+    lowBits = bcdData & 0x0F;
+    highBits = (bcdData >> 4) * 10;
+    return lowBits + highBits;
+}

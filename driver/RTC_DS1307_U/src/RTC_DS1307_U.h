@@ -6,7 +6,7 @@
 #include "RTC_U.h"
 
 //#define USE_SQW_PIN
-//#define DEBUG
+#define DEBUG
 
 
 #define RTC_DS1307_DEFAULT_I2C_ADDR 0x68  // ＲＴＣのI2Cスレーブアドレス
@@ -28,6 +28,9 @@
 #define RTC_DS1307_NUM_OF_YEAR_DIGITS       2         // RTCの年の桁数        : 2桁
 #define RTC_DS1307_HAVE_CENTURY_BIT         false     // 年が桁あふれした場合の検出用bitの有無
 #define RTC_DS1307_HAVE_MILLISEC            false     // RTCがミリ秒を取り扱うことができるか?
+#define RTC_DS1307_DETECT_LOW_BATTERY       false     // 電圧低下を検出できるか?
+#define RTC_DS1307_OSCILLATOR_CONTROL       false     // 時計の計時の進み方を調整できるか
+
 
 #define RTC_DS1307_REG_SECOND               0x00      // 秒のデータ   (0～59)
 #define RTC_DS1307_REG_MINUTE               0x01      // 分のデータ   (0～59)
@@ -39,7 +42,7 @@
 #define RTC_DS1307_REG_CLOCK_CONTROL        0x07      // クロック出力制御用
 #define RTC_DS1307_REG_NVRAM                0x08      // NVRAMの先頭アドレス
 
-
+#define RTC_DS1307_REG_NUM 8
 
 #define RTC_DS1307_OFF       0x00
 #define RTC_DS1307_ON        0x80
@@ -53,35 +56,32 @@
 class RTC_DS1307_U : public RTC_Unified {
 public:
   RTC_DS1307_U(TwoWire *theWire, int32_t rtcID = -1);
-  bool  begin(uint32_t addr=RTC_DS1307_DEFAULT_I2C_ADDR);
+  bool  begin(bool init=true, uint32_t addr=RTC_DS1307_DEFAULT_I2C_ADDR);
   bool  setTime(date_t*);
   bool  getTime(date_t*);
-  int   setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing);
-  int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
-  int   controlAlarm(uint8_t num, uint8_t action);
-  int   setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi);
-  int   setTimerMode(uint8_t num, timer_mode_t * mode);
-  int   controlTimer(uint8_t num, uint8_t action);
   int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1);
   int   setClockOutMode(uint8_t num, uint8_t freq);
   int   controlClockOut(uint8_t num, uint8_t mode);
-  uint16_t   checkInterupt(void);
-  bool  clearInterupt(uint16_t type);
   void  getRtcInfo(rtc_info_t *info);
-  void  startClock(void);
-  void  stopClock(void);
+  int   clockHaltStatus(void);
+  int   controlClockHalt(uint8_t mode);
+
+#ifdef DEBUG
+  void  dumpReg(void);
+  bool  backupRegValues(void);
+  bool  checkRegValues(uint8_t num, uint8_t mask, uint8_t value);
+#endif /* DEBUG */
 
 private:
   TwoWire *_i2c_if;
   int     _i2c_addr;
   int32_t _rtcID;
-  int8_t  _clkoe_pin;
-
   int   initRTC(void);
   bool  readReg(byte addr, byte *reg);
   bool  writeReg(byte addr, byte val);
-  uint8_t decToBcd(uint8_t val);
-  uint8_t bcdToDec(uint8_t val);
+#ifdef DEBUG
+  uint8_t  regValue[RTC_DS1307_REG_NUM];
+#endif
 };
 
 #endif /* __RTC_DS1307_U_H__ */

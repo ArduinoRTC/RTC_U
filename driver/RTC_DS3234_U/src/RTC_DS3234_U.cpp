@@ -31,10 +31,13 @@ void RTC_DS3234_U::getRtcInfo(rtc_info_t *info){
   info->haveYearOverflowBit=RTC_DS3234_HAVE_CENTURY_BIT;
   info->haveMilliSec=RTC_DS3234_HAVE_MILLISEC;
   info->independentSQW=RTC_DS3234_INDEPENDENT_SQW;
+  info->detectLowBattery=RTC_DS3234_DETECT_LOW_BATTERY;
+  info->controlOscillator=RTC_DS3234_OSCILLATOR_CONTROL;
 }
 
-bool RTC_DS3234_U::begin(void){
+bool RTC_DS3234_U::begin(bool init){
   _ds3234.begin();
+  if (!init) return true;
   if (!_ds3234.validateTimeData()) _ds3234.autoTime();
   _ds3234.controlAlarmInterrupt(0 , 0);
   _ds3234.alarm1(true);
@@ -70,7 +73,7 @@ bool RTC_DS3234_U::setTime(date_t* date){
  * ベースとなるsparkfunのドライバが設定の成功/失敗を返さないため，常時成功(RTC_U_SUCCESS)を返す．
  */
 int  RTC_DS3234_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
-  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
+  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_ILLEGAL_PARAM;
   uint8_t day, hour, min, sec, wday;
   uint8_t pinModeVal=0;
   if (mode->useInteruptPin == 1) pinModeVal=1;
@@ -130,8 +133,8 @@ int  RTC_DS3234_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
  *  引数modeの要素がNULL場合は変更しない
  */
 int  RTC_DS3234_U::setAlarmMode(uint8_t num, alarm_mode_t * mode) {
-  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
-  if (mode==NULL) return RTC_U_UNSUPPORTED;
+  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_ILLEGAL_PARAM;
+  if (mode==NULL) return RTC_U_ILLEGAL_PARAM;
   int alarm1=-1, alarm2=-1;
   if (num==0) {
     if (mode->useInteruptPin == 1) {
@@ -152,16 +155,13 @@ int  RTC_DS3234_U::setAlarmMode(uint8_t num, alarm_mode_t * mode) {
 
 /*
  * アラームの動作変更(start/stop/resumeなど)
- * タイマコントールレジスタ(アドレス0x0E)のTEビット(最上位ビット)で制御
  * 0 : 成功(RTC_U_SUCCESS)
- * 2 : 未知のアクション (未使用)
- * -1 : 存在しないアラームを制御しようとした．
  * 【注意事項】停止したアラームを再度有効にする際は，再セットアップが必要
  */
 int  RTC_DS3234_U::controlAlarm(uint8_t num, uint8_t action) {
   //if (action != 0 ) return 2;
-  if (action != 0 ) return RTC_U_UNSUPPORTED;
-  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_UNSUPPORTED;
+  if (action != 0 ) return RTC_U_ILLEGAL_PARAM;
+  if (num >= RTC_DS3234_NUM_OF_ALARM) return RTC_U_ILLEGAL_PARAM;
   if (num == 0 ) {
     _ds3234.controlAlarmInterrupt(0, -1);
   } else {
@@ -170,29 +170,6 @@ int  RTC_DS3234_U::controlAlarm(uint8_t num, uint8_t action) {
   return RTC_U_SUCCESS;
 }
 
-/*
- * タイマの設定
- * タイマは無いので，未サポート(-1:RTC_U_UNSUPPORTED)を返す．
- */
-int  RTC_DS3234_U::setTimer(uint8_t num, timer_mode_t * mode, uint8_t multi) {
-  return RTC_U_UNSUPPORTED;
-}
-
-/*
- * タイマの動作モード設定
- * タイマは無いので，未サポート(-1:RTC_U_UNSUPPORTED)を返す．
- */
-int  RTC_DS3234_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
-  return RTC_U_UNSUPPORTED;
-}
-
-/*
- * タイマの動作変更(start/stop/resumeなど)
- * タイマは無いので，未サポート(-1:RTC_U_UNSUPPORTED)を返す．
- */
-int  RTC_DS3234_U::controlTimer(uint8_t num, uint8_t action){
-  return RTC_U_UNSUPPORTED;
-}
 
 /*
  * 割り込み発生時のレジスタの内容をチェック
@@ -202,7 +179,7 @@ int  RTC_DS3234_U::controlTimer(uint8_t num, uint8_t action){
  * 2 : アラーム2番が発生した
  * 3 : アラーム1,2の両方が割り込み発生した
  */
-uint16_t RTC_DS3234_U::checkInterupt(void){
+int RTC_DS3234_U::checkInterupt(void){
   int rst=0;
   if (_ds3234.alarm1(false)) rst=1;
   if (_ds3234.alarm2(false)) rst+=2;
@@ -212,62 +189,241 @@ uint16_t RTC_DS3234_U::checkInterupt(void){
 /*
  * レジスタの割り込みフラグのクリア
  */
-bool RTC_DS3234_U::clearInterupt(uint16_t type){
-  bool alarm1=false, alarm2=false, rst=true;
-  if (type == 0) {
-    if (!_ds3234.alarm1(true)) rst=false;
-    if (!_ds3234.alarm2(true)) rst=false;
-    return rst;
-  }
-  if ((type & 0b1) > 0) alarm1=true;
-  if (((type >> 1) & 0b1) > 0) alarm2=true;
+int RTC_DS3234_U::clearInterupt(uint16_t type){
+  bool alarm1=false, alarm2=false;
+  uint8_t tmp;
+  // alarm1のチェック
+  tmp = (uint8_t) (type & 0b1);
+  if (tmp > 0) alarm1=true;
+  tmp = (uint8_t) ((type >>1) & 0b1);
+  if (tmp > 0) alarm2=true;
   if (alarm1) {
-    if (!_ds3234.alarm1(true)) rst=false;
+    _ds3234.alarm1(true);
   }
   if (alarm2) {
-    if (!_ds3234.alarm2(true)) rst=false;
+    _ds3234.alarm2(true);
   }
-  return rst;
+  return RTC_U_SUCCESS;
 }
 
 /*
  * クロック信号出力設定と出力開始
+ * Controlレジスタ(0x0E)のINTCN bit(2bit目)をクリア
+ *   RS2, RS1 (3,4bit目)に値を代入
+ * num=0 : INT/SQW端子への出力
+ * num=1 : 32KHz端子への出力
  */
 int  RTC_DS3234_U::setClockOut(uint8_t num, uint8_t freq, int8_t pin) {
-  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_UNSUPPORTED;
-  if (freq > 3) return RTC_U_UNSUPPORTED;
-  if (pin > -1) return RTC_U_UNSUPPORTED;
-  switch(freq) {
-    case 0 : _ds3234.writeSQW(SQW_SQUARE_1);break;
-    case 1 : _ds3234.writeSQW(SQW_SQUARE_1K);break;
-    case 2 : _ds3234.writeSQW(SQW_SQUARE_4K);break;
-    case 3 : _ds3234.writeSQW(SQW_SQUARE_8K);break;
-  }
-  return RTC_U_SUCCESS;
+  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_ILLEGAL_PARAM;
+  if (freq > 3) return RTC_U_ILLEGAL_PARAM;
+  if (pin != -1) return RTC_U_ILLEGAL_PARAM;
+  return setClockOutMode(num, freq);
 }
 
 /*
  * クロック出力の設定
+ * setClockOut()と同じ
  */
 int RTC_DS3234_U::setClockOutMode(uint8_t num, uint8_t freq) {
-  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_UNSUPPORTED;
-  if (freq > 3) return RTC_U_UNSUPPORTED;
-  switch(freq) {
-    case 0 : _ds3234.writeSQW(SQW_SQUARE_1);break;
-    case 1 : _ds3234.writeSQW(SQW_SQUARE_1K);break;
-    case 2 : _ds3234.writeSQW(SQW_SQUARE_4K);break;
-    case 3 : _ds3234.writeSQW(SQW_SQUARE_8K);break;
+  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_ILLEGAL_PARAM;
+  if (freq > 3) return RTC_U_ILLEGAL_PARAM;
+  if (num == 0) {
+    switch(freq) {
+      case 0 : _ds3234.writeSQW(SQW_SQUARE_1);break;
+      case 1 : _ds3234.writeSQW(SQW_SQUARE_1K);break;
+      case 2 : _ds3234.writeSQW(SQW_SQUARE_4K);break;
+      case 3 : _ds3234.writeSQW(SQW_SQUARE_8K);break;
+    }
+    return RTC_U_SUCCESS;
+  } else {
+    return RTC_U_UNSUPPORTED;
   }
-  return RTC_U_SUCCESS;
 }
 
 /*
  * クロック出力の制御
- * クロック出力レジスタ(0x0D)の最上位ビットを 0 : 発信停止 1 : 発信開始
- * ピン番号が非負の場合はソフトとピンと両方対応
+ * num=0 : コントロールレジスタ(0x0E)のINTCNビット(下から3bit目)を書き換え
+ * num=1 : ステータスレジスタ(0x0F)のEN32kHzビット(bit 3)を書き換え
  */
-int  RTC_DS3234_U::controlClockOut(uint8_t num, uint8_t mode) {
-  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_UNSUPPORTED;
-  _ds3234.controlAlarmInterrupt(-1,-1);
+int RTC_DS3234_U::controlClockOut(uint8_t num, uint8_t mode) {
+  if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_ILLEGAL_PARAM;
+  if (1 < mode ) return RTC_U_ILLEGAL_PARAM;
+  if (num==0) {
+    //_ds3234.controlAlarmInterrupt(-1,-1);
+    uint8_t reg=_ds3234.readFromRegister(DS3234_REGISTER_CONTROL);
+    if (1==mode) { // ONにする場合
+      reg = reg & 0b11111011;
+    } else { // OFFにする場合
+      reg = reg | 0b00000100;
+    }
+    _ds3234.writeToRegister(DS3234_REGISTER_CONTROL,reg);
+    return RTC_U_SUCCESS;
+  } else {
+    uint8_t reg=_ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+    if (0==mode) { // OFFにする場合
+      reg = reg & 0b11110111;
+    } else { // ONにする場合
+      reg = reg | 0b00001000;
+    }
+    _ds3234.writeToRegister(DS3234_REGISTER_STATUS,reg);
+    return RTC_U_SUCCESS;
+  }
+}
+
+int RTC_DS3234_U::checkLowPower(void) {
+  uint8_t reg;
+  reg=_ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+  uint8_t mask=0b10000000;
+  reg=reg & mask;
+  if (reg>0) return 1;
+  return 0;
+}
+
+int RTC_DS3234_U::clearPowerFlag(void) {
+  uint8_t reg;
+  reg=_ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+  uint8_t mask=0b01111111;
+  reg=reg & mask;
+  _ds3234.writeToRegister(DS3234_REGISTER_STATUS, reg);
   return RTC_U_SUCCESS;
 }
+
+/* ================  温度関係 ============== */
+/*
+ * 温度レジスタMSB 0x11 (0-6bit) 正負フラグ 7bit目
+ * 温度レジスタMSB 0x12 上位2bit (6,7bit)
+ * x 0.25で摂氏の温度が取得
+ */
+float RTC_DS3234_U::getTemperature(uint8_t kind) {
+  uint8_t msb = _ds3234.readFromRegister(DS3234_REGISTER_TEMPM);
+  uint8_t lsb = _ds3234.readFromRegister(DS3234_REGISTER_TEMPL);
+  uint8_t flag = msb & 0b10000000;
+  lsb = (lsb >> 6) & 0b00000011;
+  int val = ( msb & 0b01111111) << 2;
+  val = val | lsb;
+  if (0!=flag) val = val*(-1);
+  float celcius = val * 0.25;
+  float kelvin = celcius + 273.15;
+  float fahrenheit = celcius*1.8 + 32.0;
+  switch (kind) {
+    case RTC_U_TEMPERATURE_KELVIN:return kelvin;
+    case RTC_U_TEMPERATURE_CELCIUS:return celcius;
+    case RTC_U_TEMPERATURE_FAHRENHEIT: return fahrenheit;
+  }
+  return RTC_U_TEMPERATURE_FAILURE;
+}
+
+/*
+ * 温度制御レジスタ(0x13) BB_TD(最下位bit) : 0 温度制御なし , 1 温度制御あり
+ *    バッテリバックアップ中の温度制御を行うか否かの設定
+ * ステータスレジスタ(0x0F)のCRATE1,CRATE0 (4,5bit) : 0から3 (温度変換サンプル周期指定)
+ * 
+ * modeの最下位bit : BB_TDに対応
+ * modeの1,2bit   : CRATE1, CRATE0に対応
+ */
+int RTC_DS3234_U::setTemperatureFunction(uint8_t mode) {
+  uint8_t BB_TD = mode & 0b1;
+  uint8_t CRATE = mode & 0b110;
+  CRATE = CRATE<<3;
+  if (mode >= 8) return RTC_U_ILLEGAL_PARAM;
+  if (0==BB_TD) {
+    _ds3234.writeToRegister(DS3234_REGISTER_TEMPEN, 0);
+  } else {
+    _ds3234.writeToRegister(DS3234_REGISTER_TEMPEN, 1);
+  }
+  uint8_t status_reg = _ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+  status_reg = status_reg & 0b11001111;
+  status_reg = status_reg | CRATE;
+  _ds3234.writeToRegister(DS3234_REGISTER_STATUS, status_reg);
+  return RTC_U_SUCCESS;
+}
+
+/*
+ * ステータスレジスタ(0x0F)のBSY(2bit目)が1の場合は制御不可 (0か1かを返す)
+ */
+int RTC_DS3234_U::getTemperatureFunctionState(void) {
+  uint8_t status_reg = _ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+  status_reg = (status_reg >> 2) & 0b1;
+  return (int) status_reg;
+}
+
+/*
+ * ステータスレジスタ(0x0F)のBSY(2bit目)が1の場合は制御不可
+ * 制御レジスタ(0x0E)のCONV(5bit目)に1を書き込むと手動で変換され，終了すると自動で0に戻る
+ */
+int RTC_DS3234_U::controlTemperatureFunction(uint8_t action) {
+  if (action !=1) return RTC_U_ILLEGAL_PARAM;
+  uint8_t status_reg = _ds3234.readFromRegister(DS3234_REGISTER_STATUS);
+  status_reg = status_reg & 0b100;
+  if (1==status_reg) return RTC_U_FAILURE;
+  uint8_t control_reg = _ds3234.readFromRegister(DS3234_REGISTER_CONTROL);
+  control_reg = control_reg | 0b00100000;
+  _ds3234.writeToRegister(DS3234_REGISTER_CONTROL, control_reg);
+  return RTC_U_SUCCESS;
+}
+
+/* ======================= oscillator control =========================== */
+int RTC_DS3234_U::setOscillator(uint8_t mode) {
+  _ds3234.writeToRegister(DS3234_REGISTER_XTAL, mode);
+  return RTC_U_SUCCESS;
+}
+
+int RTC_DS3234_U::getOscillator(void) {
+  return _ds3234.readFromRegister(DS3234_REGISTER_XTAL);
+}
+
+/* ================================================================ */
+#ifdef DEBUG
+void RTC_DS3234_U::dumpReg(void) {
+  String regName[]={
+    "sec            ",
+    "min            ",
+    "hour           ",
+    "week           ",
+    "day            ",
+    "month          ",
+    "year           ",
+    "alarm_1 sec    ",
+    "alarm_1 min    ",
+    "alarm_1 hour   ",
+    "alarm_1 w/m day",
+    "alarm_2 min    ",
+    "alarm_2 hour   ",
+    "alarm_2 w/m day",
+    "control        ",
+    "status         ",
+    "crystal offset ",
+    "temperature MSB",
+    "temperature LSB",
+    "temperature ctl"
+  };
+  Serial.println("register name   | addr | value");
+  Serial.println("----------------+------+------------------");
+  for (int i=0; i< RTC_DS3234_REG_NUM; i++) {
+    if (i > 0x0F) {
+      Serial.print(regName[i]);Serial.print(" |  ");Serial.print(i,HEX);Serial.print("  | ");Serial.println(regValue[i],BIN);
+
+    } else {
+      Serial.print(regName[i]);Serial.print(" |  ");Serial.print(i,HEX);Serial.print("   | ");Serial.println(regValue[i],BIN);
+    }
+  }
+}
+
+bool RTC_DS3234_U::backupRegValues(void){
+  for (int i=0; i<RTC_DS3234_REG_NUM;i++){
+    regValue[i]=_ds3234.readFromRegister((DS3234_registers) i);
+  }
+  return true;
+}
+
+bool RTC_DS3234_U::checkRegValues(uint8_t num, uint8_t mask, uint8_t value){
+  if (num >= RTC_DS3234_REG_NUM)  return false;
+  //
+  uint8_t reg=regValue[num] & mask;
+  if (reg==value) {
+    return true;
+  }
+  return false;
+}
+#endif /* DEBUG */
+/* ================================================================ */
