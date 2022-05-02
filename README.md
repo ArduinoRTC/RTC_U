@@ -12,13 +12,14 @@
 |ベンダ| 型番 |
 | :--- | :--- |
 |エプソン|[RTC 8564NB][RTC8564NB]|
+|エプソン|[RTC4543][RTC4543]|
+|エプソン|[RX8025][RX8025]|
+|エプソン|[RX8900][RX8900]|
 |MAXIM|[DS1307][DS1307]|
 |MAXIM|[DS3234][DS3234]|
-
-検証には，以下のモジュールを使いました．
-- 秋月電子8564NB搭載モジュール - [http://akizukidenshi.com/catalog/g/gI-00233/][AkizukiRTC8564NB]
-- Grove RTC - [https://www.seeedstudio.com/Grove-RTC.html][GroveRTC]
-- SparkFun DeadOn RTC Breakout DS3234 - [https://www.sparkfun.com/products/10160][BOB-10160]
+|MAXIM|[DS3231][DS3231]|
+|Micro Crystal|[RV8803][RV8803]|
+|NXP|[PCF8523][PCF8523]|
 
 ## 3. 利用上の注意
 個人の週末のお楽しみで作っているので，各ドライバの網羅的なテストはできていません．
@@ -34,16 +35,8 @@
 
 以上で，準備はOKです．
 
-## 5. 外部リンク
-- Adafruit Unified Sensor Driver - [https://github.com/adafruit/Adafruit_Sensor][AdafruitUSD]
-- RTC-8564NB - [https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html][RTC8564NB]
-- 秋月電子8564NB搭載モジュール - [http://akizukidenshi.com/catalog/g/gI-00233/][AkizukiRTC8564NB]
-- DS1307 - [https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS1307.html][DS1307]
-- Grove RTC - [https://www.seeedstudio.com/Grove-RTC.html][GroveRTC]
-- DS3234 - [https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS3234.html][DS3234]
-- SparkFun DeadOn RTC Breakout DS3234 - [https://www.sparkfun.com/products/10160][BOB-10160]
-
 # APIマニュアル
+個別のRTCによって動作の細かなところが変わってくるので，driverディレクトリ配下の各RTCのドライバ(ライブラリ)のREADME.mdやRTCのデータシートを参照してください．
 
 ## 1. 構造体定義など
 ### 1.1. RTCの機能を格納する構造体
@@ -58,22 +51,26 @@ typedef struct {
     bool        haveYearOverflowBit;    // 年を格納するレジスタが2桁の場合にオーバーフローをした場合に利用するフラグの有無
     bool        haveMilliSec;           // ミリ秒を取り扱う機能の有無
     bool        independentSQW;         // 割り込みピンと周波数出力ピンが独立しているか否か
+    bool        detectLowBattery;       // 電源断や電源電圧の低下，電池への電源切替が発生したことを検出する機能を持つか否か
+    bool        controlOscillator;      // 時計の進み方を調整する機能を持つか否か
 } rtc_info_t;
 ```
 
 ### 1.2. タイマの動作モード
 ```
 typedef struct {
-    int8_t  repeat;
-    int8_t  useInteruptPin;
-    int8_t  interval;
+    uint8_t  pulse;
+    uint8_t  repeat;
+    uint8_t  useInteruptPin;
+    uint8_t  interval;
 } timer_mode_t;
 ```
 
 ### 1.3. アラームの動作モード
 ```
 typedef struct {
-    int8_t  useInteruptPin;
+    uint8_t  useInteruptPin;
+    uint8_t  type;
 } alarm_mode_t;
 ```
 
@@ -92,7 +89,20 @@ enum {
 };
 ```
 
-### 1.5 dateUtils.hのデータ型等
+### 1.5. 外部からの信号入力で特別な動作をするRTCのための機能
+```
+typedef struct {
+    uint8_t  useInteruptPin;
+    bool capture;
+    uint8_t level;
+    uint8_t filter;
+    bool reset;
+} event_mode_t;
+```
+特定の端子に電圧を加えるなどで，ある時点の時刻のスナップショットを取得する機能を持つRTCなどが存在するため，その機能をサポートするために必要なデータ型．
+
+
+### 1.6 参考 : dateUtils.hのデータ型等
 本ライブラリで利用する「dateUtils.h」のデータ型は以下の通り．
 
 ```
@@ -359,15 +369,15 @@ unsigned long       convertDateToEpoch(date_t dateTime)
 String              getWday(uint8_t day)
 ```
 
-[AdafruitUSD]:https://github.com/adafruit/Adafruit_Sensor
+[RTC4543]:https://www5.epsondevice.com/ja/products/rtc/rtc4543sb.html
 [RTC8564NB]:https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html
-[AkizukiRTC8564NB]:http://akizukidenshi.com/catalog/g/gI-00233/
+[RX8025]:https://www5.epsondevice.com/ja/products/rtc/rx8025sa.html
+[RX8900]:https://www5.epsondevice.com/ja/products/rtc/rx8900sa.html
 [DS1307]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS1307.html
-[GroveRTC]:https://www.seeedstudio.com/Grove-RTC.html
+[DS3231]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS3231.html
 [DS3234]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS3234.html
-[BOB-10160]:https://www.sparkfun.com/products/10160
-
-
+[RV8803]:https://www.microcrystal.com/jp/%E8%A3%BD%E5%93%81/%E3%83%AA%E3%82%A2%E3%83%AB%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%AF%E3%83%AD%E3%83%83%E3%82%AF%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB/rv-8803-c7/
+[PCF8523]:https://www.nxp.com/products/peripherals-and-logic/signal-chain/real-time-clocks/rtcs-with-ic-bus/100-na-real-time-clock-calendar-with-battery-backup:PCF8523
 
 <!--- コメント
 
