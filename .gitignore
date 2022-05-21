@@ -36,4 +36,8 @@ build/
 # vim
 *~
 *.swp
-driver/RTC_8564NB_U/A045_リアルタイムクロック.pdf
+
+## data sheet
+#*.pdf
+#*.docx
+#*.jpg
