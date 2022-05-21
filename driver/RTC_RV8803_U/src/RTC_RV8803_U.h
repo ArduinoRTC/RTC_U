@@ -1,5 +1,5 @@
-#ifndef __RTC_RV8803_U__
-#define __RTC_RV8803_U__
+#ifndef __RTC_RV8803_U_H__
+#define __RTC_RV8803_U_H__
 
 #include "RTC_U.h"
 #include "Wire.h"
@@ -76,6 +76,8 @@
 #define RTC_RV8803_REG_OFFSET             0x2C
 #define RTC_RV8803_REG_EVENT              0x2F
 
+#define RTC_RV8803_SRAM_BASE_ADDR         0x07
+#define RTC_RV8803_SRAM_SIZE              1
 
 #define RTC_RV8803_INIT_DELAY             2000
 
@@ -111,7 +113,9 @@ public:
 // 外部イベント
   int   setEvent(event_mode_t *mode);
   int   getEvent(void);
-
+// SRAMアクセス
+  int   getSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+  int   setSRAM(uint8_t addr, uint8_t *array, uint16_t len);
 
 #ifdef DEBUG
   void  dumpReg(void);
@@ -149,4 +153,4 @@ private:
 };
 
 
-#endif /* __RTC_RV8803_U.h__ */
+#endif /* __RTC_RV8803_U_H__ */

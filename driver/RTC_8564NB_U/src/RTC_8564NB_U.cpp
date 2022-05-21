@@ -47,13 +47,14 @@ bool RTC_8564NB_U::getTime(date_t* date){
     result = getRegValue(i);
     if (0 > result) return false;
     data[i-RTC_EPSON_8564NB_REG_SECONDS] = (uint8_t) result;
+    delayMicroseconds(2);
   }
-  date->second = bcdToInt(data[0]);
-  date->minute = bcdToInt(data[1]);
-  date->hour   = bcdToInt(data[2]);
-  date->mday   = bcdToInt(data[3]);
-  date->wday   = data[4];
-  date->month  = bcdToInt(data[5]);
+  date->second = bcdToInt(data[0] & 0x7F);
+  date->minute = bcdToInt(data[1] & 0x7F);
+  date->hour   = bcdToInt(data[2] & 0x3F);
+  date->mday   = bcdToInt(data[3] & 0x3F);
+  date->wday   = data[4] & 0x07;
+  date->month  = bcdToInt(data[5] & 0x1F);
   date->year   = bcdToInt(data[6]) + 2000;
   return true;
 }
@@ -284,7 +285,7 @@ int RTC_8564NB_U::checkInterupt(void){
   int result = getRegValue(RTC_EPSON_8564NB_REG_CONTROL2);
   if (0> result) return result;
   uint8_t intr = (uint8_t) result;
-  intr = intr | 0b00001100;
+  intr = intr & 0b00001100;
   intr = intr >>2;
   return intr;
 }
@@ -294,17 +295,13 @@ int RTC_8564NB_U::checkInterupt(void){
  * control2レジスタ(0x01)のAF, TFビット(2,3bit)の0クリア
  */
 int RTC_8564NB_U::clearInterupt(uint16_t type){
-  if ((1 > type) || (3 < type)) return RTC_U_ILLEGAL_PARAM;
-  uint8_t timers, alarms;
-  timers=(uint8_t) 0b01 & type;
-  alarms=(uint8_t)(type >> 1) & 0b01;
+  type=type&0b11;
   uint8_t mask;
-  if ((alarms == 0) && (timers == 1)) { // タイマのフラグを消す
-    mask = 0b11111011;
-  } else if ((alarms == 1) && (timers == 0)) { // アラームのフラグを消す
-    mask = 0b11110111;
-  } else { // 両方消す
-    mask = 0b11110011;
+  switch(type) {
+    case 0: return RTC_U_SUCCESS;
+    case 1: mask = 0b11111011;break;
+    case 2: mask = 0b11110111;break;
+    default: mask = 0b11110011;
   }
   uint8_t control2;
   int result = getRegValue(RTC_EPSON_8564NB_REG_CONTROL2);
@@ -414,6 +411,7 @@ int RTC_8564NB_U::getRegValue(uint8_t addr){
       return (int) _i2c_if->read()  ; // Regを受信
     }
   }
+  delayMicroseconds(2);
   return RTC_U_FAILURE;
 }
 
@@ -425,6 +423,7 @@ bool RTC_8564NB_U::setRegValue(uint8_t addr, uint8_t val) {
   _i2c_if->write(addr);
   _i2c_if->write(val);
   int flag = _i2c_if->endTransmission();
+  delayMicroseconds(2);
   if (flag == 0) return true;
   return false;
 }

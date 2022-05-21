@@ -51,7 +51,8 @@
 #define RTC_DS1307_SQW_8kHZ  0x12
 #define RTC_DS1307_SQW_32kHZ 0x13
 
-
+#define RTC_DS1307_SRAM_BASE_ADDR 0x08
+#define RTC_DS1307_SRAM_SIZE 56
 
 class RTC_DS1307_U : public RTC_Unified {
 public:
@@ -65,6 +66,9 @@ public:
   void  getRtcInfo(rtc_info_t *info);
   int   clockHaltStatus(void);
   int   controlClockHalt(uint8_t mode);
+  int   getSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+  int   setSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+
 
 #ifdef DEBUG
   void  dumpReg(void);

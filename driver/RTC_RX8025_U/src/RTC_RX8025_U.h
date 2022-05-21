@@ -37,7 +37,7 @@
 #define RTC_EPSON_RX8025_DEFAULT_MIN              0         //                          (分)
 #define RTC_EPSON_RX8025_DEFAULT_SECOND           0         //                          (秒)
 
-#define RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL      1         // 1ms
+#define RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL      65         // 65micro sec (63マイクロ秒がアプリケーションマニュアルの推奨)
 #define RTC_EPSON_RX8025_REG_NUM 16
 
 #define RTC_EPSON_RX8025_REG_SECOND           0x0

@@ -292,7 +292,7 @@ void testSetDate(void) {
   date.millisecond=0;
 
   /* RTCに現在時刻を設定 */
-  if (RTC_U_SUCCESS!=rtc.setTime(&date)) {
+  if (!rtc.setTime(&date)) {
     Serial.print("set time to RTC fail.") ;     // 初期化失敗
     while(1);
   } else {

@@ -105,7 +105,6 @@ bool RTC_DS1307_U::setTime(date_t *data) {
  * pinは無視
  */
 int  RTC_DS1307_U::setClockOut(uint8_t num, uint8_t freq, int8_t pin) {
-  //_clkoe_pin = pin;
   return setClockOutMode( num,  freq);
 }
 
@@ -161,6 +160,28 @@ int RTC_DS1307_U::controlClockHalt(uint8_t mode) {
     default : return RTC_U_ILLEGAL_PARAM;
   }
   if (!writeReg(0, reg)) return RTC_U_FAILURE;
+  return RTC_U_SUCCESS;
+}
+/* ================================================================ */
+int RTC_DS1307_U::getSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_DS1307_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  addr = addr + RTC_DS1307_SRAM_BASE_ADDR;
+  for (int i=0 ; i< len ; i++) {
+    if (!readReg(addr+i, data+i)) return RTC_U_FAILURE;
+  }
+  return RTC_U_SUCCESS;
+}
+
+int RTC_DS1307_U::setSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_DS1307_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  addr = addr + RTC_DS1307_SRAM_BASE_ADDR;
+  for (int i=0 ; i< len ; i++) {
+    if (!writeReg(addr+i, *(data+i))) return RTC_U_FAILURE;
+  }
   return RTC_U_SUCCESS;
 }
 /* ================================================================ */

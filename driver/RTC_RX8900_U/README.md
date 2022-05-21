@@ -325,6 +325,22 @@ RX8900では調整機能はON/OFFできませんが，調整を実行する周�
 |RTC_U_FAILURE |設定失敗|
 |RTC_U_ILLEGAL_PARAM |サポートしていないパラメータの設定など|
 
+## SRAM領域へのアクセス
+RV8803ではレジスタ番号``0x07``がSRAM領域として利用できます．以下の2つの関数の第1引数``addr``が0の場合に，このレジスタを利用します．
+また，``len``は1しか利用できません．
+
+### SRAM領域からの読み取り
+```
+int getSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+レジスタ番号``0x07``のデータを配列arrayの最初の要素に代入されます．
+
+### SRAM領域への書き込み
+```
+int setSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+配列arrayの最初の要素のデータをレジスタ番号``0x07``に書き込みます．
+
 
 [RX8900]:https://www5.epsondevice.com/ja/products/rtc/rx8900sa.html
 [AkizukiRTC_RX8900]:https://akizukidenshi.com/catalog/g/gK-13009/

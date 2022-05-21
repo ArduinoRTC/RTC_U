@@ -33,6 +33,9 @@
 
 #define RTC_EPSON_RX8900_I2C_ACCESS_INTERVAL      1         // 1ms
 
+#define RTC_EPSON_RX8900_SRAM_BASE_ADDR         0x07
+#define RTC_EPSON_RX8900_SRAM_SIZE              1
+
 #ifdef DEBUG
 #define RTC_EPSON_RX8900_REG_NUM 18
 #endif
@@ -60,6 +63,8 @@ public:
   float getTemperature(uint8_t mode);
   int   setTemperatureFunction(uint8_t mode);
   int   controlClock(void);
+  int   getSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+  int   setSRAM(uint8_t addr, uint8_t *array, uint16_t len);
 #ifdef DEBUG
   void  dumpReg(void);
   bool  backupRegValues(void);
@@ -79,7 +84,7 @@ private:
   int setUTimerMode(timer_mode_t * mode);
   int controlUTimer(uint8_t action);
   int setAlarmFlag(void);
-  int clearRegisters(void);
+  void clearRegisters(void);
   TwoWire *_i2c_if;
   int     _i2c_addr;
   int32_t _rtcID;

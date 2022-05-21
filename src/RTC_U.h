@@ -99,6 +99,8 @@ public:
     virtual int         controlClock(void) {return RTC_U_UNSUPPORTED;};
     virtual int         setEvent(event_mode_t mode) {return RTC_U_UNSUPPORTED;};
     virtual int         getEvent(void) {return RTC_U_UNSUPPORTED;};
+    virtual int         getSRAM(uint8_t addr, uint8_t *array, uint16_t len) {return RTC_U_UNSUPPORTED;};
+    virtual int         setSRAM(uint8_t addr, uint8_t *array, uint16_t len) {return RTC_U_UNSUPPORTED;};
 
 
     void                convertEpochTime(date_t * dateTime , unsigned long epochTime);

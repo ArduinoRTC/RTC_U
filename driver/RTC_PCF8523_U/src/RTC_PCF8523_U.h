@@ -1,5 +1,5 @@
-#ifndef __RTC_PCF8523_U__
-#define __RTC_PCF8523_U__
+#ifndef __RTC_PCF8523_U_H__
+#define __RTC_PCF8523_U_H__
 
 #include "RTC_U.h"
 #include "Wire.h"
@@ -114,4 +114,4 @@ private:
   int writeRegs(uint8_t addr, uint8_t *val, uint8_t len);
 };
 
-#endif /* __RTC_PCF8523_U__ */
+#endif /* __RTC_PCF8523_U_H__ */

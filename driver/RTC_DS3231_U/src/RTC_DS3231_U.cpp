@@ -88,18 +88,21 @@ int  RTC_DS3231_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {
   uint8_t day, hour, min, sec, wday;
   uint8_t pinModeVal=0;
   if (mode->useInteruptPin == 1) pinModeVal=1;
-  wday = timing->wday;
-  if (wday == 7) wday=0xFF;
-  if (wday == 0) wday=7;
-  if ((wday < 8)&&(timing->mday!=0xFF)) return RTC_U_ILLEGAL_PARAM;
+  if (timing->wday==0) {
+    wday=7;
+  } else if (timing->wday > 6) {
+    wday=0xFF;
+  } else {
+    wday=timing->wday;
+  }
   if ((wday == 0xFF)&&(timing->mday==0xFF)) {
     day=0xFF;
   }
-  if (wday<8) {
+  if (0xFF != timing->mday) {
+    day=intToBCD(timing->mday);
+  } else if (wday<8) {
     day=intToBCD(wday);
     day = day | 0b01000000;
-  } else if (0xFF != timing->mday) {
-    day=intToBCD(timing->mday);
   } else {
     day = 0b10000000;
   }
@@ -251,8 +254,7 @@ int RTC_DS3231_U::clearInterupt(uint16_t type){
   switch(type) {
     case 1: mask = 0b11111110;break;
     case 2: mask = 0b11111101;break;
-    case 3: mask = 0b11111100;break;
-    default : return RTC_U_ILLEGAL_PARAM;
+    default: mask = 0b11111100;break;
   }
   uint8_t reg;
   int result = readRegs(RTC_DS3231_REG_STATUS, &reg, 1);
@@ -272,7 +274,6 @@ int RTC_DS3231_U::clearInterupt(uint16_t type){
 int  RTC_DS3231_U::setClockOut(uint8_t num, uint8_t freq, int8_t pin) {
   if (num >= RTC_DS3231_NUM_OF_CLOCKOUT) return RTC_U_ILLEGAL_PARAM;
   if (freq > 3) return RTC_U_ILLEGAL_PARAM;
-  if (pin != -1) return RTC_U_ILLEGAL_PARAM;
   return setClockOutMode(num, freq);
 }
 

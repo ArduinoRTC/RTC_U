@@ -425,6 +425,24 @@ RTCのエージングオフセットレジスタ(0x10番)の値を引数``mode``
 返り値は常時``RTC_U_SUCCESS``です．
 
 
+## SRAM領域へのアクセス
+DS1307ではレジスタとは別に256バイトのSRAM領域が利用できます．以下の2つの関数の第1引数``addr``は0から255となります．
+また，第1引数``addr``と第3引数``len``の合計がレジスタの数より大きい場合はエラーとなります．
+
+### SRAM領域からの読み取り
+```
+int getSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+第1引数の``addr``から``len``個のデータを連続して読み取ります．
+
+### SRAM領域への書き込み
+```
+int setSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+第1引数の``addr``から``len``個のデータをSRAM領域として利用可能なレジスタに連続して書き込みます．
+
+
+
 [DS3234]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS3234.html
 [BOB-10160]:https://www.sparkfun.com/products/10160
 [github]:https://github.com/sparkfun/SparkFun_DS3234_RTC_Arduino_Library

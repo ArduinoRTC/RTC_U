@@ -357,7 +357,7 @@ int   setTimerMode(uint8_t num, timer_mode_t * mode)
 |uint8_t  pulse | 未使用 ||
 |uint8_t  repeat | 未使用 ||
 |uint8_t  useInteruptPin |制御レジスタ(0x0F)のTIE(4bit)に代入|割り込み信号を外部に出すか否か|
-|uint8_t  interval |拡張レジスタ(0x0D)のTE(5bit)に代入|タイマのON/OFF|
+|uint8_t  interval |拡張レジスタ(0x0D)のTD(0,1bit)に代入|カウントダウンタイマの基準周波数選択|
 
 ### タイマのOn/OFF
 
@@ -365,19 +365,12 @@ int   setTimerMode(uint8_t num, timer_mode_t * mode)
 int   controlTimer(uint8_t num, uint8_t action)
 ```
 
-
 | 返り値 | 意味 |
 |---|---|
 |RTC_U_SUCCESS |設定成功|
 |RTC_U_FAILURE |設定失敗|
 |RTC_U_ILLEGAL_PARAM |サポートしていないパラメータの設定など|
 
-
-#### ``num=0``の時の動作
-
-定周期タイマはOFFできないため，なにもせずに常に``RTC_U_UNSUPPORTED``を返します．
-
-#### ``num=1``の時の動作
 
 |``mode``の値 | 動作|
 |---|---|
@@ -421,6 +414,22 @@ int   getEvent(void)
 |16から31|未使用|
 |8から15|秒データ(レジスタ番号0x21)|
 |0から7|10ms単位の時間(レジスタ番号0x20)|
+
+## SRAM領域へのアクセス
+RV8803ではレジスタ番号``0x07``がSRAM領域として利用できます．以下の2つの関数の第1引数``addr``が0の場合に，このレジスタを利用します．
+また，``len``は1しか利用できません．
+
+### SRAM領域からの読み取り
+```
+int getSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+レジスタ番号``0x07``のデータを配列arrayの最初の要素に代入されます．
+
+### SRAM領域への書き込み
+```
+int setSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+配列arrayの最初の要素のデータをレジスタ番号``0x07``に書き込みます．
 
 
 [データシート]:https://tamadevice.co.jp/pdf/mc/rtc/jpn/rv-8803-c7-datasheet-j.pdf

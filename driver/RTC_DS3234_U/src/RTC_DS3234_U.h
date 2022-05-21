@@ -27,6 +27,8 @@
 #define RTC_DS3234_DETECT_LOW_BATTERY       true      // 電圧低下を検出できるか?
 #define RTC_DS3234_OSCILLATOR_CONTROL       true      // 時計の計時の進み方を調整できるか
 
+#define RTC_DS3234_SRAM_SIZE 256
+
 #ifdef DEBUG
 #define RTC_DS3234_REG_NUM 0x14
 #endif
@@ -59,6 +61,9 @@ public:
   int   controlTemperatureFunction(uint8_t action);
   int   setOscillator(uint8_t mode);
   int   getOscillator(void);
+  int   getSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+  int   setSRAM(uint8_t addr, uint8_t *array, uint16_t len);
+
 #ifdef DEBUG
   void  dumpReg(void);
   bool  backupRegValues(void);

@@ -138,7 +138,7 @@ typedef struct  {
 
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void getRtcInfo(rtc_info_t *info)
 ```
 
 RTCの初期化関数で，引数はRTCの種類によって異なるため，具体的な内容は各ドライバを参照．
@@ -156,7 +156,7 @@ bool begin(bool init=true)
 ### 2.2. 時刻設定
 引数で与えられた時刻をRTCに設定する．なお，本ライブラリ(と各RTCのドライバ)は，12時間制(AM/PM)はサポートしていません．
 ```
-bool        setTime(date_t* time)
+bool setTime(date_t* time)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -166,7 +166,7 @@ bool        setTime(date_t* time)
 ### 2.3. 時刻取得
 引数で与えた構造体に，RTCから取得した時刻情報を書き込む．
 ```
-bool        getTime(date_t* time)
+bool getTime(date_t* time)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -177,7 +177,7 @@ bool        getTime(date_t* time)
 
 numで指定した番号のアラームを発行する時刻(timing)とアラームの動作モード(mode)を設定．modeの値や意味はRTCによって異なるため，詳細は各ドライバを参照．
 ```
-int         setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing)
+int setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -188,7 +188,7 @@ int         setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing)
 
 numで指定した番号のアラームの動作モード(mode)を設定．modeの値や意味はRTCによって異なるため，詳細は各ドライバを参照．
 ```
-int         setAlarmMode(uint8_t num, alarm_mode_t * mode)
+int setAlarmMode(uint8_t num, alarm_mode_t * mode)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -198,7 +198,7 @@ int         setAlarmMode(uint8_t num, alarm_mode_t * mode)
 
 numで指定した番号のアラームを開始/停止/一時停止する関数．actionの意味や具体的な動作はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int         controlAlarm(uint8_t num, uint8_t action)
+int controlAlarm(uint8_t num, uint8_t action)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -209,7 +209,7 @@ int         controlAlarm(uint8_t num, uint8_t action)
 ### 2.5. タイマ関係
 numで指定した番号のタイマの動作をmodeとmultiで設定．一般的には，modeで用いる周波数とmultiで何周期で発火するかを意味するが，RTCの書類によって異なるため，詳細は各ドライバを参照．
 ```
-int         setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -219,7 +219,7 @@ int         setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 numで指定した番号のタイマの動作modeを設定．モードの内容等はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int         setTimerMode(uint8_t num, timer_mode_t * mode)
+int setTimerMode(uint8_t num, timer_mode_t * mode)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -229,7 +229,7 @@ int         setTimerMode(uint8_t num, timer_mode_t * mode)
 
 numで指定した番号のタイマを開始/停止/一時停止する関数．actionの意味や具体的な動作はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int         controlTimer(uint8_t num, uint8_t action)
+int controlTimer(uint8_t num, uint8_t action)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -240,7 +240,7 @@ int         controlTimer(uint8_t num, uint8_t action)
 ### 2.6. クロック出力関係
 第3引数のピンに第2引数freqで指定した周波数の信号を出す．第1引数のnumは
 ```
-int         setClockOut(uint8_t num, uint8_t freq, int8_t pin)
+int setClockOut(uint8_t num, uint8_t freq, int8_t pin)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -250,7 +250,7 @@ int         setClockOut(uint8_t num, uint8_t freq, int8_t pin)
 
 第1引数で指定したクロック出力設定の周波数を変更する関数．
 ```
-int         setClockOutMode(uint8_t num, uint8_t freq)
+int setClockOutMode(uint8_t num, uint8_t freq)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -260,7 +260,7 @@ int         setClockOutMode(uint8_t num, uint8_t freq)
 
 第1引数で指定したクロック出力を制御(開始/停止)する関数．
 ```
-int         controlClockOut(uint8_t num, uint8_t mode)
+int controlClockOut(uint8_t num, uint8_t mode)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -271,12 +271,12 @@ int         controlClockOut(uint8_t num, uint8_t mode)
 ### 2.7. 割り込み関係
 割り込みが発生しているか否かの検査で返り値が割り込み番号．返り値の内容はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int    checkInterupt(void)
+int checkInterupt(void)
 ```
 
 typeで指定したアラームやタイマの割り込みフラグを消す．typeの内容はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int        clearInterupt(uint16_t type)
+int clearInterupt(uint16_t type)
 ```
 
 | 返り値 | 意味 |
@@ -294,14 +294,14 @@ int        clearInterupt(uint16_t type)
 この機能を装備したRTCでは電圧降下を示すRTC内のフラグ値の取得とそのフラグをクリアするため，以下の2種類の関数があります．
 
 ```
-int   checkLowPower(void)
+int checkLowPower(void)
 
 ```
 この関数は，電圧降下があったか否かを示すフラグ値を取得できます．RTCにその機能がない場合は``RTC_U_UNSUPPORTED``，取得に失敗した場合は``RTC_U_FAILURE``を返します．両方の値共に負の値なので，0以上の値が取得できた場合はフラグ値となります．このフラグ値の具体的な内容はRTCの種類によって異なるため，各RTC用ドライバのREADME.mdを参照してください．
 
 
 ```
-int   clearPowerFlag(void)
+int clearPowerFlag(void)
 
 ```
 この関数は電圧降下を監視するフラグ値をクリアするためのものです．
@@ -317,7 +317,7 @@ int setLowPower(uint8_t mode)
 一部のRTCでは，消費電力低減のために時計の更新(クロック)を止める機能を持つものがあります．それに対応する以下のメンバ関数を用意しました．
 
 ```
-int         controlClockHalt(uint8_t mode)
+int controlClockHalt(uint8_t mode)
 ```
 クロックを止める機能があるRTCで止める，再開するを制御します．
 
@@ -333,7 +333,7 @@ int         controlClockHalt(uint8_t mode)
 |RTC_U_ILLEGAL_PARAM |``mode``の値が不正|
 
 ```
-int         clockHaltStatus(void);
+int clockHaltStatus(void)
 ```
 この関数はクロックが止まっているか否かを示します．
 | 返り値 | 意味 |
@@ -352,8 +352,21 @@ int controlClock(void)
 |RTC_U_SUCCESS |設定成功|
 |RTC_U_FAILURE |設定失敗|
 
+### 2.11
+一部のRTCには，レジスタの一部をSRAMとして自由に利用して良い領域が用意されています．この領域を読み書きするための関数を用意してあります．
+ただし，利用可能な領域はあるアドレスに相当する8bitがまるまる利用可能なところのみに限定しています．
+RTCの種類によってはレジスタの特定の1bitだけが利用可能とかありますが，このような場所は利用可能な領域から外しています．
+```
+int getSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+第1引数の``addr``は該当レジスタのアドレスではなく，0から始まる領域の番号になります．第2引数は読んだデータを格納するための領域(配列)へのポインタ，第3引数は読み取る領域のサイズ(1以上)となります．
 
-### 2.11 ユーティリティ関数
+```
+int setSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+引数の意味は``getSRAM()``と同じです．
+
+### 2.12 ユーティリティ関数
 UNIX時間(1970年元日からの秒数)を第2引数に与えると，第一引数の構造体に西暦の年月日，時刻を返す関数．
 ```
 void                convertEpochTime(date_t * dateTime , unsigned long epochTime)
@@ -368,6 +381,38 @@ unsigned long       convertDateToEpoch(date_t dateTime)
 ```
 String              getWday(uint8_t day)
 ```
+
+## 3. サンプルプログラム
+
+RTCの主要な機能に対応するサンプルプログラムを用意してあります．
+各サンプルプログラム(スケッチ)に付属するconfig.hを編集し，RTCのピンの定義，どのRTCを利用するかを定義してインストールしてください．
+
+|機能|サンプルプログラム名|
+|---|---|
+|アラーム|SimpleAlarm|
+|カウントダウンタイマ|SimpleCountdownTimer|
+|定周期タイマ|SimpleIntervalTimer|
+|watchdogタイマ|なし|
+|オフセット調整|SimpleOffset|
+|RTC温度|SimpleTemperature|
+|TCXO|同上|
+|SQW出力調整|SimpleSQW|
+|SRAM|accessSRAM|
+|外部イベント|なし|
+
+各RTCがどの機能を有しているかは以下の表にまとめてあります．
+
+|RTC|アラーム|カウントダウンタイマ|定周期タイマ|watchdogタイマ|オフセット調整|RTC温度|TCXO|SQW出力調整|SRAM|外部イベント|
+|---|---|---|---|---|---|---|---|---|---|---|
+|4543|||||||||||
+|8564|○|○||||||○|||
+|DS1307||||||||○|○||
+|DS3231|○||||○|○||○|||
+|DS3234|○||||○|○|○|○|○||
+|PCF8523|○|○||○|○||||||
+|RV8803|○|○|○||○|||○|○|○|
+|RX8025|○||○||○||||||
+|RX8900|○|○|○|||○|○|○|○||
 
 [RTC4543]:https://www5.epsondevice.com/ja/products/rtc/rtc4543sb.html
 [RTC8564NB]:https://www5.epsondevice.com/ja/products/rtc/rtc8564nb.html

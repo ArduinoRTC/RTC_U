@@ -88,10 +88,21 @@ bool RTC_RX8900_U::setTime(date_t* time){
  * 時刻レジスタ書き込み
  */
 bool RTC_RX8900_U::setTimeReg(uint8_t sec, uint8_t minute, uint8_t hour, uint8_t wday, uint8_t day, uint8_t mon, uint8_t year){
+  uint8_t w;
+  switch(wday) {
+    case 0 : w=1;break;
+    case 1 : w=2;break;
+    case 2 : w=4;break;
+    case 3 : w=8;break;
+    case 4 : w=16;break;
+    case 5 : w=32;break;
+    case 6 : w=64;break;
+  }
   if (!setRegValue(0x00,sec))    return false; // sec
   if (!setRegValue(0x01,minute)) return false; // minute
   if (!setRegValue(0x02,hour))   return false; // hour
-  if (!setRegValue(0x03,wday))   return false; // wday
+  //if (!setRegValue(0x03,wday))   return false; // wday
+  if (!setRegValue(0x03,w))   return false; // wday
   if (!setRegValue(0x04,day))    return false; // day
   if (!setRegValue(0x05,mon))    return false; // mon
   if (!setRegValue(0x06,year))   return false; // year
@@ -126,8 +137,16 @@ bool RTC_RX8900_U::getTime(date_t* time){
   uint8_t mday_list[]={ 31, 29, 31, 30, 31, 30, 31, 31, 30,  31, 30, 31 };
   uint8_t mday_max=mday_list[time->month-1];
   if (mday_max < time->mday) return false;
-  if (w>6) return false;
-  time->wday=w;
+  switch(w) {
+    case  1: time->wday=0;break;
+    case  2: time->wday=1;break;
+    case  4: time->wday=2;break;
+    case  8: time->wday=3;break;
+    case 16: time->wday=4;break;
+    case 32: time->wday=5;break;
+    case 64: time->wday=6;break;
+    default: return false;
+  }
   time->hour=bcdToInt(h);
   if (time->hour>23) return false;
   time->minute=bcdToInt(mi);
@@ -195,7 +214,6 @@ int RTC_RX8900_U::checkInterupt(void) {
  * 割り込みフラグクリア
  */
 int RTC_RX8900_U::clearInterupt(uint16_t type) {
-  if (type > 7) return RTC_U_ILLEGAL_PARAM;
   // read flag register
   int rst=getRegValue(0x0E);
   if (rst < 0) return RTC_U_FAILURE;
@@ -450,8 +468,8 @@ int RTC_RX8900_U::controlUTimer(uint8_t action) {
 
 /*
  * num
- *  - 0 : 定周期タイマ
- *  - 1 : 時刻更新タイマ(割り込み)
+ *  - 1 : 定周期タイマ
+ *  - 0 : カウントダウンタイマ(割り込み)
  */
 int RTC_RX8900_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
   switch(num) {
@@ -463,8 +481,8 @@ int RTC_RX8900_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
 
 /*
  * num
- *  - 0 : 定周期タイマ
- *  - 1 : 時刻更新タイマ(割り込み)
+ *  - 1 : 定周期タイマ
+ *  - 0 : カウントダウンタイマ(割り込み)
  */
 int RTC_RX8900_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
   switch(num) {
@@ -476,8 +494,8 @@ int RTC_RX8900_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
 
 /*
  * num
- *  - 0 : 定周期タイマ
- *  - 1 : 時刻更新タイマ(割り込み)
+ *  - 1 : 定周期タイマ
+ *  - 0 : 時刻更新タイマ(割り込み)
  */
 int RTC_RX8900_U::controlTimer(uint8_t num, uint8_t action) {
   switch(num) {
@@ -612,7 +630,7 @@ int RTC_RX8900_U::controlAlarm(uint8_t num, uint8_t action) {
 
 
 /* ================================================================ */
-int RTC_RX8900_U::clearRegisters(void) {
+void RTC_RX8900_U::clearRegisters(void) {
   for (int i=0; i<16;i++){
     setRegValue(i, 0);
   }
@@ -654,6 +672,26 @@ int RTC_RX8900_U::controlClock(void) {
   if (rst < 0) return RTC_U_FAILURE;
   uint8_t reg=((uint8_t) rst)&0b11111110;
   if (!setRegValue(0x0F, reg)) return RTC_U_FAILURE;
+  return RTC_U_SUCCESS;
+}
+
+/* ======================= SRAM アクセス ============================== */
+int RTC_RX8900_U::getSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_EPSON_RX8900_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  addr = addr + RTC_EPSON_RX8900_SRAM_BASE_ADDR;
+  int regValue = getRegValue(addr);
+  if (regValue < 0) return regValue;
+  (*data) = (uint8_t) regValue;
+  return RTC_U_SUCCESS;
+}
+
+int RTC_RX8900_U::setSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_EPSON_RX8900_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  if (!setRegValue(RTC_EPSON_RX8900_SRAM_BASE_ADDR, *data)) return RTC_U_FAILURE;
   return RTC_U_SUCCESS;
 }
 

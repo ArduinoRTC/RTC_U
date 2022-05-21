@@ -216,7 +216,6 @@ int RTC_DS3234_U::clearInterupt(uint16_t type){
 int  RTC_DS3234_U::setClockOut(uint8_t num, uint8_t freq, int8_t pin) {
   if (num >= RTC_DS3234_NUM_OF_CLOCKOUT) return RTC_U_ILLEGAL_PARAM;
   if (freq > 3) return RTC_U_ILLEGAL_PARAM;
-  if (pin != -1) return RTC_U_ILLEGAL_PARAM;
   return setClockOutMode(num, freq);
 }
 
@@ -371,7 +370,32 @@ int RTC_DS3234_U::setOscillator(uint8_t mode) {
 int RTC_DS3234_U::getOscillator(void) {
   return _ds3234.readFromRegister(DS3234_REGISTER_XTAL);
 }
+/* ================================================================ */
+int RTC_DS3234_U::getSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_DS3234_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  // SRAMアドレスレジスタにaddrの値を書き込み
+  _ds3234.writeToRegister(DS3234_REGISTER_SRAMA,addr);
+  for (int i=0 ; i< len ; i++) {
+    // SRAMデータレジスタの値をdata+iに書き込み
+    *(data+i)=_ds3234.readFromRegister(DS3234_REGISTER_SRAMD);
+  }
+  return RTC_U_SUCCESS;
+}
 
+int RTC_DS3234_U::setSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_DS3234_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  // SRAMアドレスレジスタにaddrの値を書き込み
+  _ds3234.writeToRegister(DS3234_REGISTER_SRAMA,addr);
+  for (int i=0 ; i< len ; i++) {
+    _ds3234.writeToRegister(DS3234_REGISTER_SRAMD,*(data+i));
+  }
+  return RTC_U_SUCCESS;
+}
+/* ================================================================ */
 /* ================================================================ */
 #ifdef DEBUG
 void RTC_DS3234_U::dumpReg(void) {

@@ -22,6 +22,7 @@ void RTC_RX8025_U::getRtcInfo(rtc_info_t *info){
 }
 
 bool RTC_RX8025_U::setTimeReg(uint8_t sec, uint8_t minute, uint8_t hour, uint8_t wday, uint8_t day, uint8_t mon, uint8_t year){
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   _i2c_if->beginTransmission(_i2c_addr);
   _i2c_if->write(0x00);       // select reg no.0
   _i2c_if->write(sec);        // second
@@ -32,6 +33,7 @@ bool RTC_RX8025_U::setTimeReg(uint8_t sec, uint8_t minute, uint8_t hour, uint8_t
   _i2c_if->write(mon);        // month
   _i2c_if->write(year);       // year
   uint8_t rst = _i2c_if->endTransmission();
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   if (0!=rst) return false;
   return true;
 }
@@ -40,6 +42,14 @@ bool RTC_RX8025_U::begin(bool force, uint32_t addr){
   _i2c_addr=addr;
   _i2c_if->begin();
   delay(RTC_EPSON_RX8025_INIT_DELAY);
+
+  int result = getRegValue(RTC_EPSON_RX8025_REG_CONTROL1);
+  if (result < 0) return false;
+  uint8_t control1 = (uint8_t) result;
+  control1 = control1 & 0b11011111;
+  control1 = control1 | 0b00100000;
+  result = setRegValue(0xE0, control1);
+  if (result < 0) return false;
   if (!force) return true;
   // Set control registers.
   _i2c_if->beginTransmission(_i2c_addr);
@@ -47,7 +57,7 @@ bool RTC_RX8025_U::begin(bool force, uint32_t addr){
   _i2c_if->write(RTC_EPSON_RX8025_CONTROL1_REG_CFG); // Control1 reg
   _i2c_if->write(0x00);                             // Control2 reg (all off)
   _i2c_if->endTransmission();
-  delay(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
 
   //Serial.println("begin pos 1.");
 
@@ -56,7 +66,7 @@ bool RTC_RX8025_U::begin(bool force, uint32_t addr){
                     intToBCD(RTC_EPSON_RX8025_DEFAULT_HOUR), RTC_EPSON_RX8025_DEFAULT_DAY_OF_WEEK, 
                     intToBCD(RTC_EPSON_RX8025_DEFAULT_DAY), intToBCD(RTC_EPSON_RX8025_DEFAULT_MONTH), 
                     intToBCD(RTC_EPSON_RX8025_DEFAULT_YEAR))) return false;
-  delay(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
 
   // unset all alarm
   _i2c_if->beginTransmission(_i2c_addr);
@@ -67,7 +77,7 @@ bool RTC_RX8025_U::begin(bool force, uint32_t addr){
   _i2c_if->write(0x00);  //  B:Alarm_D ; Minute
   _i2c_if->write(0x00);  //  C:Alarm_D ; Hour
   _i2c_if->endTransmission();
-  delay(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
 
   return true;
 }
@@ -79,7 +89,7 @@ bool RTC_RX8025_U::checkYearOverflow(uint8_t m){
 
 bool RTC_RX8025_U::getTime(date_t* time){
   uint8_t y, m, w, d, h, mi, s;
-
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   _i2c_if->beginTransmission(_i2c_addr);
   _i2c_if->write(0x00);
   int result = _i2c_if->endTransmission();     // データの送信と終了処理
@@ -94,7 +104,7 @@ bool RTC_RX8025_U::getTime(date_t* time){
   d  = _i2c_if->read();
   m  = _i2c_if->read();
   y  = _i2c_if->read();
-
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   time->year=bcdToInt(y);
   bool flag=checkYearOverflow(m);
   m = 0b01111111 & m;
@@ -147,6 +157,7 @@ bool RTC_RX8025_U::setTime(date_t* time){
 
 int RTC_RX8025_U::getRegValue(uint8_t addr){
   if (addr > 0x0F) return RTC_U_FAILURE;
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   addr=(addr<<4) & 0b11110000;
   _i2c_if->beginTransmission(_i2c_addr);
   _i2c_if->write(addr);
@@ -157,15 +168,17 @@ int RTC_RX8025_U::getRegValue(uint8_t addr){
       return _i2c_if->read()  ; // Regを受信
     }
   }
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   return RTC_U_FAILURE;
-
 }
 
 bool RTC_RX8025_U::setRegValue(uint8_t addr, uint8_t val) {
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   _i2c_if->beginTransmission(_i2c_addr);
   _i2c_if->write(addr);
   _i2c_if->write(val);
   int flag = _i2c_if->endTransmission();
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   if (flag == 0) return true;
   return false;
 }
@@ -230,8 +243,20 @@ int RTC_RX8025_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing){
   uint8_t min, hour, wday;
   min=intToBCD(timing->minute);
   hour=intToBCD(timing->hour);
-  wday=timing->wday;
+  //wday=timing->wday;
+  switch(timing->wday) {
+    case 0: wday=0b00000001;break;
+    case 1: wday=0b00000010;break;
+    case 2: wday=0b00000100;break;
+    case 3: wday=0b00001000;break;
+    case 4: wday=0b00010000;break;
+    case 5: wday=0b00100000;break;
+    case 6: wday=0b01000000;break;
+    default:wday=(timing->wday)&0b01111111;
+  }
+  
   // レジスタ値を設定
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   if (num==0) { // alarm_W設定, レジスタ 0x08, 0x09, 0x0Aに書き込み
     _i2c_if->beginTransmission(_i2c_addr);
     _i2c_if->write(0x80);       // select reg no.0
@@ -248,6 +273,7 @@ int RTC_RX8025_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing){
     uint8_t rst = _i2c_if->endTransmission();
     if (0!=rst) return RTC_U_FAILURE;
   }
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   // numで指定されたalarmを有効にする
   return controlAlarm( num,  1);
 }
@@ -260,6 +286,7 @@ int RTC_RX8025_U::setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing){
  */
 int RTC_RX8025_U::controlAlarm(uint8_t num, uint8_t action){
   if (num >= RTC_EPSON_RX8025_NUM_OF_ALARM) return RTC_U_ILLEGAL_PARAM;
+  delayMicroseconds(RTC_EPSON_RX8025_I2C_ACCESS_INTERVAL);
   // ctrl1レジスタ(0x0E)の値を取得
   int regValue=getRegValue(RTC_EPSON_RX8025_REG_CONTROL1);
   if (regValue < 0) return regValue;
@@ -460,7 +487,7 @@ int RTC_RX8025_U::checkInterupt(void){
 }
 
 int RTC_RX8025_U::clearInterupt(uint16_t type){
-  if (type > 7) return RTC_U_ILLEGAL_PARAM;
+  //if (type > 7) return RTC_U_ILLEGAL_PARAM;
   // ctrl2レジスタ(0x0F)の値を取得
   int regValue=getRegValue(RTC_EPSON_RX8025_REG_CONTROL2);
   if (regValue < 0) return RTC_U_FAILURE;

@@ -20,9 +20,7 @@ bool RTC_RV8803_U::begin(bool init, uint8_t addr) {
   date.hour = RTC_RV8803_DEFAULT_HOUR;
   date.minute = RTC_RV8803_DEFAULT_MIN;
   date.second = RTC_RV8803_DEFAULT_SECOND;
-  if (0 > setTime(&date)) return false;
-  //if (0 > controlAlarm(0,0)) return false;
-  //if (0 > controlTimer(0,0)) return false;
+  if (!setTime(&date)) return false;
   return true;
 }
 
@@ -95,10 +93,10 @@ bool RTC_RV8803_U::setTime(date_t* date){
   regs[4]=intToBCD(date->mday);
   regs[5]=intToBCD(date->month);
   uint8_t year = date->year -2000;
-  //regs[6]=intToBCD((uint8_t) (date->year) % 100);
   regs[6]=intToBCD(year);
   int result= writeRegs(RTC_RV8803_REG_SECOND, regs, 7);
-  return result;
+  if (RTC_U_SUCCESS != result) return false;
+  return true;
 }
 
 /* ===================== 電源電圧関係 ========================= */
@@ -197,13 +195,16 @@ int RTC_RV8803_U::checkInterupt(void) {
 }
 
 int RTC_RV8803_U::clearInterupt(uint16_t type) {
-  if (type > 15) return RTC_U_ILLEGAL_PARAM;
-  type = (~type) << 2;
+  //if (type > 15) return RTC_U_ILLEGAL_PARAM;
+  uint8_t mask=(uint8_t) type;
+  mask = mask & 0b1111;
+  mask = (~mask) << 2;
+  mask = mask | 0b11;
   uint8_t flag_reg;
   int result = readRegs(RTC_RV8803_REG_FLAG, &flag_reg, 1);
   if (0>result) return result;
-  flag_reg = flag_reg & 0b11000011;
-  flag_reg = flag_reg & type;
+  //flag_reg = flag_reg & 0b11000011;
+  flag_reg = flag_reg & mask;
   return writeRegs(RTC_RV8803_REG_FLAG, &flag_reg, 1);
 }
 
@@ -348,28 +349,31 @@ int RTC_RV8803_U::setIntervalTimer(timer_mode_t * mode) {
   if (0 > result) return result;
   result = writeRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
   if (0 > result) return result;
-  return setIntervalTimerMode(mode);
+  result = setIntervalTimerMode(mode);
+  if (0 > result) return result;
+  return controlIntervalTimer(1);
 }
 
 int RTC_RV8803_U::setIntervalTimerMode(timer_mode_t * mode) {
-  if (mode->useInteruptPin > 1) return RTC_U_ILLEGAL_PARAM;
   if (mode->interval > 1) return RTC_U_ILLEGAL_PARAM;
-  uint8_t ext_reg, control_reg;
+  uint8_t ext_reg;
   int result = readRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
   if (0 > result) return result;
-  result = readRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
-  if (0 > result) return result;
   ext_reg = ext_reg & 0b11011111;
-  control_reg = control_reg & 0b11011111;
-  if (mode->useInteruptPin == 1) ext_reg = ext_reg | 0b00100000;
-  if (mode->interval == 1) control_reg = control_reg | 0b00100000;
-  result = writeRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
-  if (0 > result) return result;
-  return writeRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
+  if (mode->interval == 1) ext_reg = ext_reg | 0b00100000;
+  return writeRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
 }
 
 int RTC_RV8803_U::controlIntervalTimer(uint8_t action) {
-  return RTC_U_UNSUPPORTED;
+  uint8_t control_reg;
+  int result = readRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
+  if (0 > result) return result;
+  switch(action) {
+    case 0: control_reg = control_reg & 0b11011111;break;
+    case 1: control_reg = control_reg | 0b00100000;break;
+    default: return RTC_U_ILLEGAL_PARAM; 
+  }
+  return writeRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
 }
 
 int RTC_RV8803_U::setCountdownTimer(timer_mode_t * mode, uint16_t multi) {
@@ -435,6 +439,23 @@ int RTC_RV8803_U::controlCountdownTimer(uint8_t action) {
   ext_reg = ext_reg & 0b11101111;
   if (action==1) ext_reg = ext_reg | 0b00010000;
   return writeRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
+}
+
+/* ======================= SRAM アクセス ============================== */
+int RTC_RV8803_U::getSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_RV8803_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  addr = addr + RTC_RV8803_SRAM_BASE_ADDR;
+  return readRegs(addr, data, len);
+}
+
+int RTC_RV8803_U::setSRAM(uint8_t addr, uint8_t *data, uint16_t len) {
+  if (len==0) return RTC_U_ILLEGAL_PARAM;
+  if ((addr+len)>RTC_RV8803_SRAM_SIZE) return RTC_U_ILLEGAL_PARAM;
+  if (data==NULL) return RTC_U_ILLEGAL_PARAM;
+  addr = addr + RTC_RV8803_SRAM_BASE_ADDR;
+  return writeRegs(addr, data, len);
 }
 
 /* ========================= 外部イベント ========================= */

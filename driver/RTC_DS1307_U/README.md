@@ -141,10 +141,10 @@ int   setClockOutMode(uint8_t num, uint8_t freq)
 第2引数は``setClockOut()``と同じく下の表の通りです．
 |``freq``の値|クロック周波数|
 |---|---|
-|0|4096Hz|
-|1|64Hz|
-|2|1秒|
-|3|1分|
+|0|1Hz|
+|1|4kHz|
+|2|8kHz|
+|3|32kHz|
 
 | 返り値 | 意味 |
 |---|---|
@@ -199,15 +199,22 @@ int   controlClockHalt(uint8_t mode)
 |RTC_U_SUCCESS |設定成功|
 |RTC_U_FAILURE |設定失敗|
 
-## 未サポート機能
-DS1307には以下の機能がありませんので，以下の機能に関連する関数は何もせずに，``RTC_U_UNSUPPORTED``を返します．
+## SRAM領域へのアクセス
+DS1307ではレジスタ番号``0x08``から56個がSRAM領域として利用できます．以下の2つの関数の第1引数``addr``が0の場合にレジスタ番号``0x08``
+からデータを読み取ります．また，第1引数``addr``と第3引数``len``の合計がレジスタの数より大きい場合はエラーとなります．
 
-- アラーム
-- タイマ
-- 温度による時刻の補正
-- 時刻補正のための周波数の調整
-- アラームやタイマで発生した割り込み信号用端子関連
-- 電源電圧低下や電源喪失(電池で動作したか否か)に関する機能
+### SRAM領域からの読み取り
+```
+int getSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+第1引数の``addr``から``len``個のデータを連続して読み取ります．
+
+### SRAM領域への書き込み
+```
+int setSRAM(uint8_t addr, uint8_t *array, uint16_t len)
+```
+第1引数の``addr``から``len``個のデータをSRAM領域として利用可能なレジスタに連続して書き込みます．
+
 
 [DS1307]:https://www.maximintegrated.com/jp/products/analog/real-time-clocks/DS1307.html
 [GroveRTC]:https://www.seeedstudio.com/Grove-RTC.html
