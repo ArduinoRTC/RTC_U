@@ -61,15 +61,15 @@ public:
   int   setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing);
   int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
   int   controlAlarm(uint8_t num, uint8_t action);
-  int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi);
-  int   setTimerMode(uint8_t num, timer_mode_t * mode);
+  int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi);
+  int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode);
   int   controlTimer(uint8_t num, uint8_t action);
   int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1);
   int   setClockOutMode(uint8_t num, uint8_t freq);
   int   controlClockOut(uint8_t num, uint8_t mode);
   int   checkInterupt(void);
   int   clearInterupt(uint16_t type);
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
   int   checkLowPower(void);
   int   clearPowerFlag(void);
 #ifdef DEBUG

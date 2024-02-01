@@ -57,7 +57,7 @@ public:
   bool  begin(bool init=true, uint8_t addr=RTC_PCF8523_DEFAULT_ADRS);
   bool  setTime(date_t*);
   bool  getTime(date_t*);
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
   int   checkLowPower(void);
   int   clearPowerFlag(void);
   int   setLowPower(uint8_t mode);
@@ -78,8 +78,8 @@ public:
   int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
   int   controlAlarm(uint8_t num, uint8_t action);
 
-  int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi);
-  int setTimerMode(uint8_t num, timer_mode_t * mode);
+  int setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi);
+  int setTimerMode(uint8_t num, rtc_timer_mode_t * mode);
   int controlTimer(uint8_t num, uint8_t action);
 
 
@@ -90,17 +90,17 @@ public:
 #endif /* DEBUG */
 
 private:
-  int   setBTimer(timer_mode_t * mode, uint16_t multi);
-  int   setBTimerMode(timer_mode_t * mode);
+  int   setBTimer(rtc_timer_mode_t * mode, uint16_t multi);
+  int   setBTimerMode(rtc_timer_mode_t * mode);
   int   controlBTimer(uint8_t action);
-  int   setATimer(timer_mode_t * mode, uint16_t multi);
-  int   setATimerMode(timer_mode_t * mode);
+  int   setATimer(rtc_timer_mode_t * mode, uint16_t multi);
+  int   setATimerMode(rtc_timer_mode_t * mode);
   int   controlATimer(uint8_t action);
-  int   setWTimer(timer_mode_t * mode, uint16_t multi);
-  int   setWTimerMode(timer_mode_t * mode);
+  int   setWTimer(rtc_timer_mode_t * mode, uint16_t multi);
+  int   setWTimerMode(rtc_timer_mode_t * mode);
   int   controlWTimer(uint8_t action);
-  int   setSecTimer(timer_mode_t * mode);
-  int   setSecTimerMode(timer_mode_t * mode);
+  int   setSecTimer(rtc_timer_mode_t * mode);
+  int   setSecTimerMode(rtc_timer_mode_t * mode);
   int   controlSecTimer(uint8_t action);
   TwoWire *i2c_if;
   uint8_t i2c_addr;

@@ -24,7 +24,7 @@ bool RTC_RV8803_U::begin(bool init, uint8_t addr) {
   return true;
 }
 
-void RTC_RV8803_U::getRtcInfo(rtc_info_t *info){
+void RTC_RV8803_U::getRtcInfo(rtc_u_info_t *info){
   info->type=RV8803;
   info->numOfInteruptPin=RTC_RV8803_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_RV8803_NUM_OF_ALARM;
@@ -313,7 +313,7 @@ int RTC_RV8803_U::controlAlarm(uint8_t num, uint8_t action) {
 /*
  * 
  */
-int RTC_RV8803_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
+int RTC_RV8803_U::setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi) {
   switch(num) {
     case 0: return setIntervalTimer(mode);
     case 1: return setCountdownTimer(mode, multi);
@@ -321,7 +321,7 @@ int RTC_RV8803_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
   return RTC_U_ILLEGAL_PARAM;
 }
 
-int RTC_RV8803_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
+int RTC_RV8803_U::setTimerMode(uint8_t num, rtc_timer_mode_t * mode) {
   switch(num) {
     case 0: return setIntervalTimerMode(mode);
     case 1: return setCountdownTimerMode(mode);
@@ -337,7 +337,7 @@ int RTC_RV8803_U::controlTimer(uint8_t num, uint8_t action) {
   return RTC_U_ILLEGAL_PARAM;
 }
 
-int RTC_RV8803_U::setIntervalTimer(timer_mode_t * mode) {
+int RTC_RV8803_U::setIntervalTimer(rtc_timer_mode_t * mode) {
   uint8_t flag_reg, control_reg;
   int result = readRegs(RTC_RV8803_REG_FLAG, &flag_reg, 1);
   if (0 > result) return result;
@@ -354,7 +354,7 @@ int RTC_RV8803_U::setIntervalTimer(timer_mode_t * mode) {
   return controlIntervalTimer(1);
 }
 
-int RTC_RV8803_U::setIntervalTimerMode(timer_mode_t * mode) {
+int RTC_RV8803_U::setIntervalTimerMode(rtc_timer_mode_t * mode) {
   if (mode->interval > 1) return RTC_U_ILLEGAL_PARAM;
   uint8_t ext_reg;
   int result = readRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
@@ -376,7 +376,7 @@ int RTC_RV8803_U::controlIntervalTimer(uint8_t action) {
   return writeRegs(RTC_RV8803_REG_CONTROL, &control_reg, 1);
 }
 
-int RTC_RV8803_U::setCountdownTimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_RV8803_U::setCountdownTimer(rtc_timer_mode_t * mode, uint16_t multi) {
   uint8_t ext_reg, flag_reg, control_reg;
   int result = readRegs(RTC_RV8803_REG_EXTENSION, &ext_reg, 1);
   if (0 > result) return result;
@@ -409,7 +409,7 @@ int RTC_RV8803_U::setCountdownTimer(timer_mode_t * mode, uint16_t multi) {
   return controlCountdownTimer(1);
 }
 
-int RTC_RV8803_U::setCountdownTimerMode(timer_mode_t * mode) {
+int RTC_RV8803_U::setCountdownTimerMode(rtc_timer_mode_t * mode) {
   if (mode->useInteruptPin>1) return RTC_U_ILLEGAL_PARAM;
   if (mode->interval>3) return RTC_U_ILLEGAL_PARAM;
   uint8_t ext_reg, control_reg;

@@ -26,7 +26,7 @@ typedef struct {
     uint8_t  repeat;
     uint8_t  useInteruptPin;
     uint8_t  interval;
-} timer_mode_t;
+} rtc_timer_mode_t;
 
 typedef struct {
     uint8_t  useInteruptPin;
@@ -65,7 +65,7 @@ typedef struct {
     bool        independentSQW;
     bool        detectLowBattery;
     bool        controlOscillator;
-} rtc_info_t;
+} rtc_u_info_t;
 
 class RTC_Unified {
 public:
@@ -76,15 +76,15 @@ public:
     virtual int         setAlarm(uint8_t num, alarm_mode_t * mode, date_t* timing) {return RTC_U_UNSUPPORTED;};
     virtual int         setAlarmMode(uint8_t num, alarm_mode_t * mode) {return RTC_U_UNSUPPORTED;};
     virtual int         controlAlarm(uint8_t num, uint8_t action) {return RTC_U_UNSUPPORTED;};
-    virtual int         setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {return RTC_U_UNSUPPORTED;};
-    virtual int         setTimerMode(uint8_t num, timer_mode_t * mode) {return RTC_U_UNSUPPORTED;};
+    virtual int         setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi) {return RTC_U_UNSUPPORTED;};
+    virtual int         setTimerMode(uint8_t num, rtc_timer_mode_t * mode) {return RTC_U_UNSUPPORTED;};
     virtual int         controlTimer(uint8_t num, uint8_t action) {return RTC_U_UNSUPPORTED;};
     virtual int         setClockOut(uint8_t num, uint8_t freq, int8_t pin) {return RTC_U_UNSUPPORTED;};
     virtual int         setClockOutMode(uint8_t num, uint8_t freq) {return RTC_U_UNSUPPORTED;};
     virtual int         controlClockOut(uint8_t num, uint8_t mode) {return RTC_U_UNSUPPORTED;};
     virtual int         checkInterupt(void) {return 0;};
     virtual int         clearInterupt(uint16_t type) {return false;};
-    virtual void        getRtcInfo(rtc_info_t *info) {};
+    virtual void        getRtcInfo(rtc_u_info_t *info) {};
     virtual int         setOscillator(uint8_t mode) {return RTC_U_UNSUPPORTED;};
     virtual int         getOscillator(void) {return RTC_U_UNSUPPORTED;};
     virtual int         controlTemperatureFunction(uint8_t action) {return RTC_U_UNSUPPORTED;};

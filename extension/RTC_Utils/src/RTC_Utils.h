@@ -16,7 +16,7 @@
 #endif /* USE_DS1307 */
 
 #ifdef USE_DS3231
-#include "RTC_DS3231.h"
+#include "RTC_DS3231_U.h"
 #endif /* USE_DS3231 */
 
 #ifdef USE_DS3234

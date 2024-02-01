@@ -53,7 +53,7 @@ typedef struct {
     bool        independentSQW;         // 割り込みピンと周波数出力ピンが独立しているか否か
     bool        detectLowBattery;       // 電源断や電源電圧の低下，電池への電源切替が発生したことを検出する機能を持つか否か
     bool        controlOscillator;      // 時計の進み方を調整する機能を持つか否か
-} rtc_info_t;
+} rtc_u_info_t;
 ```
 
 ### 1.2. タイマの動作モード
@@ -63,7 +63,7 @@ typedef struct {
     uint8_t  repeat;
     uint8_t  useInteruptPin;
     uint8_t  interval;
-} timer_mode_t;
+} rtc_timer_mode_t;
 ```
 
 ### 1.3. アラームの動作モード
@@ -138,7 +138,7 @@ typedef struct  {
 
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void getRtcInfo(rtc_info_t *info)
+void getRtcInfo(rtc_u_info_t *info)
 ```
 
 RTCの初期化関数で，引数はRTCの種類によって異なるため，具体的な内容は各ドライバを参照．
@@ -209,7 +209,7 @@ int controlAlarm(uint8_t num, uint8_t action)
 ### 2.5. タイマ関係
 numで指定した番号のタイマの動作をmodeとmultiで設定．一般的には，modeで用いる周波数とmultiで何周期で発火するかを意味するが，RTCの書類によって異なるため，詳細は各ドライバを参照．
 ```
-int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 | 返り値 | 意味 |
 |---|---|
@@ -219,7 +219,7 @@ int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 numで指定した番号のタイマの動作modeを設定．モードの内容等はRTCの種類によって異なるため，各ドライバを参照．
 ```
-int setTimerMode(uint8_t num, timer_mode_t * mode)
+int setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 | 返り値 | 意味 |
 |---|---|

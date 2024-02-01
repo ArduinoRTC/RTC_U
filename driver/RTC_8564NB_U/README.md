@@ -79,7 +79,7 @@ EPSON　8564NBのデフォルトI2Cのアドレスではない番号を持つモ
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 ## 時刻関係機能
@@ -179,7 +179,7 @@ int   controlAlarm(uint8_t num, uint8_t action)
 アラームと同様に，タイマ機能も1種類しかないため，以下の関数の第1引数の値は``0``限定となります．
 ### タイマ設定
 ```
-int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 第2引数modeの構造体メンバの意味は以下の通り．
 |構造体メンバ|0|1|2|3|
@@ -201,7 +201,7 @@ int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 ### タイマのモード設定
 ```
-int   setTimerMode(uint8_t num, timer_mode_t * mode)
+int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 第2引数は上の``setTimer()``と同じ．
 

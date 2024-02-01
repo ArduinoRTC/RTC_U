@@ -2,10 +2,10 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-timer_mode_t		KEYWORD1
+rtc_timer_mode_t		KEYWORD1
 alarm_mode_t		KEYWORD1
 event_mode_t		KEYWORD1
-rtc_info_t		KEYWORD1
+rtc_u_info_t		KEYWORD1
 RTC_Unified     	KEYWORD1
 
 pulse			KEYWORD1

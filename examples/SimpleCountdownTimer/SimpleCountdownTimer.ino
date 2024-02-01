@@ -27,7 +27,7 @@ void printTime(date_t * date){
  * タイマの設定
  */
 int setupTimer_8564() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.repeat=0;         // 繰り返しなし
   mode.useInteruptPin=0; // 割り込みピン利用しない
   mode.interval=1;       // 64Hz
@@ -35,28 +35,28 @@ int setupTimer_8564() {
 }
 
 int setupTimer_RX8900() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=0;  // 割り込みピン利用しない
   mode.interval=0b01;     // 64Hz
   return rtc.setTimer(0,&mode, 0xFF);
 }
 
 int setupTimer_PCF8523() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.interval=0b001;   // 64Hz
   mode.useInteruptPin=0; // 割り込みピンは使わない
   return rtc.setTimer(0,&mode, 0xFF);
 }
 
 int setupTimer_RV8803() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=0; // 割り込みピン利用しない
   mode.interval=0b01;    // 64Hz
   return rtc.setTimer(1,&mode, 0xFF);
 }
 
 int setupTimer() {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON8564NB:return setupTimer_8564();
@@ -105,7 +105,7 @@ int checkTimerInterupt_RV8803() {
 }
 
 int checkTimerInterupt(){
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON8564NB:return checkTimerInterupt_8564();

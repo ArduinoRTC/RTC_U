@@ -51,7 +51,7 @@ public:
   int   setClockOutMode(uint8_t num, uint8_t freq);
   int   controlClockOut(uint8_t num, uint8_t mode);
 
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
   int   checkLowPower(void);
   int   clearPowerFlag(void);
 

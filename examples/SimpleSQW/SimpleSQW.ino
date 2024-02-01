@@ -57,7 +57,7 @@ uint8_t freqParam[][FREQ_1HZ+1]={
  * rtcの温度による時刻の進み具体の調整(TCXO)のパラメータ設定
  */
 int setupSQW(uint8_t freq) {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   uint8_t rtcType;
   switch(rtcInfo.type) {

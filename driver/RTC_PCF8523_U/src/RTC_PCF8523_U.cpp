@@ -37,7 +37,7 @@ bool RTC_PCF8523_U::begin(bool init, uint8_t addr) {
   return true;
 }
 
-void RTC_PCF8523_U::getRtcInfo(rtc_info_t *info){
+void RTC_PCF8523_U::getRtcInfo(rtc_u_info_t *info){
   info->type=PCF8523;
   info->numOfInteruptPin=RTC_PCF8523_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_PCF8523_NUM_OF_ALARM;
@@ -354,7 +354,7 @@ int RTC_PCF8523_U::controlAlarm(uint8_t num, uint8_t action) {
 
 /* ========================タイマ関係================================= */
 
-int RTC_PCF8523_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
+int RTC_PCF8523_U::setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi) {
   switch(num) {
     case 0: return setBTimer(mode, multi);
     case 1: return setATimer(mode, multi);
@@ -364,7 +364,7 @@ int RTC_PCF8523_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
   return RTC_U_ILLEGAL_PARAM;
 }
 
-int RTC_PCF8523_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
+int RTC_PCF8523_U::setTimerMode(uint8_t num, rtc_timer_mode_t * mode) {
   switch(num) {
     case 0: return setBTimerMode(mode);
     case 1: return setATimerMode(mode);
@@ -384,7 +384,7 @@ int RTC_PCF8523_U::controlTimer(uint8_t num, uint8_t action) {
   return RTC_U_ILLEGAL_PARAM;
 }
 
-int RTC_PCF8523_U::setBTimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_PCF8523_U::setBTimer(rtc_timer_mode_t * mode, uint16_t multi) {
   uint8_t timer_b_reg = (uint8_t) multi;
   int result = writeRegs(RTC_PCF8523_REG_TIMER_B, &timer_b_reg, 1);
   if (0>result) return result;
@@ -393,7 +393,7 @@ int RTC_PCF8523_U::setBTimer(timer_mode_t * mode, uint16_t multi) {
   return controlBTimer(1);
 }
 
-int RTC_PCF8523_U::setBTimerMode(timer_mode_t * mode) {
+int RTC_PCF8523_U::setBTimerMode(rtc_timer_mode_t * mode) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -436,7 +436,7 @@ int RTC_PCF8523_U::controlBTimer(uint8_t action) {
   return writeRegs(RTC_PCF8523_REG_TIMER_CLOCKOUT_CONTROL, &clk_out, 1);
 }
 
-int RTC_PCF8523_U::setATimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_PCF8523_U::setATimer(rtc_timer_mode_t * mode, uint16_t multi) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -451,7 +451,7 @@ int RTC_PCF8523_U::setATimer(timer_mode_t * mode, uint16_t multi) {
   return controlATimer(1);
 }
 
-int RTC_PCF8523_U::setATimerMode(timer_mode_t * mode) {
+int RTC_PCF8523_U::setATimerMode(rtc_timer_mode_t * mode) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -494,7 +494,7 @@ int RTC_PCF8523_U::controlATimer(uint8_t action) {
   return writeRegs(RTC_PCF8523_REG_TIMER_CLOCKOUT_CONTROL, &clk_out, 1);
 }
 
-int RTC_PCF8523_U::setWTimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_PCF8523_U::setWTimer(rtc_timer_mode_t * mode, uint16_t multi) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -509,7 +509,7 @@ int RTC_PCF8523_U::setWTimer(timer_mode_t * mode, uint16_t multi) {
   return controlWTimer(1);
 }
 
-int RTC_PCF8523_U::setWTimerMode(timer_mode_t * mode) {
+int RTC_PCF8523_U::setWTimerMode(rtc_timer_mode_t * mode) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -552,7 +552,7 @@ int RTC_PCF8523_U::controlWTimer(uint8_t action) {
   return writeRegs(RTC_PCF8523_REG_TIMER_CLOCKOUT_CONTROL, &clk_out, 1);
 }
 
-int RTC_PCF8523_U::setSecTimer(timer_mode_t * mode) {
+int RTC_PCF8523_U::setSecTimer(rtc_timer_mode_t * mode) {
   uint8_t control_2;
   int result = readRegs(RTC_PCF8523_REG_CONTROL_2, &control_2, 1);
   if (0>result) return result;
@@ -564,7 +564,7 @@ int RTC_PCF8523_U::setSecTimer(timer_mode_t * mode) {
   return controlSecTimer(1);
 }
 
-int RTC_PCF8523_U::setSecTimerMode(timer_mode_t * mode) {
+int RTC_PCF8523_U::setSecTimerMode(rtc_timer_mode_t * mode) {
   uint8_t clk_out;
   int result = readRegs(RTC_PCF8523_REG_TIMER_CLOCKOUT_CONTROL, &clk_out, 1);
   if (0>result) return result;

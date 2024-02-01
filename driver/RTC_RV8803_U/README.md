@@ -73,7 +73,7 @@ RTCの初期化．引数で``false``を与えると，時刻設定等を行わ�
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 
@@ -293,7 +293,7 @@ int   controlAlarm(uint8_t num, uint8_t action)
 
 ### タイマ設定と有効化
 ```
-int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 
 | 返り値 | 意味 |
@@ -328,7 +328,7 @@ int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 ### タイマのパラメータ変更
 ```
-int   setTimerMode(uint8_t num, timer_mode_t * mode)
+int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 
 | 返り値 | 意味 |

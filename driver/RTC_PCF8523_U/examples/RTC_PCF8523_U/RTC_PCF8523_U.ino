@@ -42,7 +42,7 @@ enum {
 #endif /* DEBUG */
 
 RTC_PCF8523_U rtc = RTC_PCF8523_U(&Wire);
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 
 /*
@@ -91,7 +91,7 @@ void printInterupt(int val) {
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);
@@ -1146,7 +1146,7 @@ void testTimerB(void) {
 
   // タイマBの設定を実行してレジスタを確認
   Serial.println(F("6.3 set timer B"));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.pulse  = 0b111;
   mode.repeat = 1;
   mode.useInteruptPin = 1;
@@ -1357,7 +1357,7 @@ void testTimerA(void) {
 
   // タイマBの設定を実行してレジスタを確認
   Serial.println(F("7.3 set timer A"));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.repeat = 1;
   mode.useInteruptPin = 1;
   mode.interval = 0b001;
@@ -1570,7 +1570,7 @@ void testWatchDog(void) {
 
   // ワッチドッグタイマの設定を実行してレジスタを確認
   Serial.println(F("8.3 set watchdog timer"));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.repeat = 1;
   mode.useInteruptPin = 1;
   mode.interval = 0b001;
@@ -1756,7 +1756,7 @@ void testTimerSec(void) {
 
   // 秒タイマの設定を実行してレジスタを確認
   Serial.println(F("9.3 set watchdog timer"));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.repeat = 1;
   rst = rtc.setTimer (3, &mode, 0b11111111);
 #ifdef DEBUG

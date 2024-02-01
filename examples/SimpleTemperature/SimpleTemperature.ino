@@ -28,7 +28,7 @@ void printTime(date_t * date){
  */
 
 int setupTCXO(void) {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON_RX8900:return rtc.setTemperatureFunction(3); // 30秒間隔

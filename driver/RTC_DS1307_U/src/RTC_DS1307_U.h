@@ -63,7 +63,7 @@ public:
   int   setClockOut(uint8_t num, uint8_t freq, int8_t pin=-1);
   int   setClockOutMode(uint8_t num, uint8_t freq);
   int   controlClockOut(uint8_t num, uint8_t mode);
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
   int   clockHaltStatus(void);
   int   controlClockHalt(uint8_t mode);
   int   getSRAM(uint8_t addr, uint8_t *array, uint16_t len);

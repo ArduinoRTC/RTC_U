@@ -71,7 +71,7 @@ RTCの初期化．引数で``false``を与えると，時刻設定等を行わ�
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 
@@ -383,9 +383,9 @@ int   controlAlarm(uint8_t num, uint8_t action)
 
 ### 各タイマのパラメータ
 
-タイマの関数には``timer_mode_t mode``と``uint16_t multi``の2種類の引数でタイマのパラメータを設定します．各タイマでこの引数がどのように扱われるか(どのレジスタのどのbitに代入されるか)をまとめておきます．各レジスタのbitの意味についてはデータシートを参照してください．
+タイマの関数には``rtc_timer_mode_t mode``と``uint16_t multi``の2種類の引数でタイマのパラメータを設定します．各タイマでこの引数がどのように扱われるか(どのレジスタのどのbitに代入されるか)をまとめておきます．各レジスタのbitの意味についてはデータシートを参照してください．
 
-| timer_mode_tのメンバ | タイマB (num=0) | タイマA (num=1) | watchdogタイマ(num=2) | 定周期(Second)タイマ(num=3)|
+| rtc_timer_mode_tのメンバ | タイマB (num=0) | タイマA (num=1) | watchdogタイマ(num=2) | 定周期(Second)タイマ(num=3)|
 |---|---|---|---|---|
 | uint8_t  repeat |timer and CLKOUT controlレジスタのTBM  |timer and CLKOUT controlレジスタのTAM  | 同左 | 同左 |
 | uint8_t  useInteruptPin |control 2レジスタのCTBIE |control 2レジスタのCTAIE |control 2レジスタのWTAIE|(未使用) |
@@ -401,7 +401,7 @@ int   controlAlarm(uint8_t num, uint8_t action)
 
 ### タイマの設定
 ```
-int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 上の表に従い，multiの値をタイマの種類毎に処理(レジスタに代入)を行い，``setTimerMode(mode)``と``controlTimer(num,1)``を中で順に呼び出しています．
 
@@ -414,7 +414,7 @@ int setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 ### タイマのパラメータ変更
 ```
-int setTimerMode(uint8_t num, timer_mode_t * mode)
+int setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 
 ここでは，上のパラメータの表に従い，mode引数の構造体各メンバの値をレジスタに代入しています．

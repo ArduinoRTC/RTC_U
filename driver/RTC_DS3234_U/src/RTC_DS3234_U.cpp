@@ -21,7 +21,7 @@ RTC_DS3234_U::RTC_DS3234_U(uint8_t cs, uint8_t miso, uint8_t mosi, uint8_t sck, 
   _ds3234(cs, mosi, miso, sck)
 {}
 
-void RTC_DS3234_U::getRtcInfo(rtc_info_t *info){
+void RTC_DS3234_U::getRtcInfo(rtc_u_info_t *info){
   info->type=DS3234;
   info->numOfInteruptPin=RTC_DS3234_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_DS3234_NUM_OF_ALARM;

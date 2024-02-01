@@ -75,12 +75,12 @@ RTC_8564NB_U rtc = RTC_8564NB_U(&Wire);
 
 
 
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);
@@ -317,7 +317,7 @@ void testTimer(void) {
   // タイマ設定
   Serial.println("3.1 setup timer.");
   // 設定内容
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.interval       = 0b01;
   mode.repeat         = 0;
   mode.useInteruptPin = 1;

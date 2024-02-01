@@ -50,12 +50,12 @@ RTC_DS1307_U rtc = RTC_DS1307_U(&Wire);
 //RTC_DS1307_U rtc = RTC_DS1307_U(&Wire1);
 
 
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);

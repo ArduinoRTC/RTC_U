@@ -77,7 +77,7 @@ I2Cのアドレスにデフォルトでないものを用いる場合は
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 ## 時刻関連
@@ -158,7 +158,7 @@ int   controlAlarm(uint8_t num, uint8_t action)
 RX8025はタイマが1種類しかないため，以下の関数の第1引数``num``は0のみとなります．
 ### タイマ設定
 ```
-int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 第2引数modeの構造体メンバは以下の4種類がありますが，RX8025ではintervalのみが意味を持ちます．
 
@@ -183,7 +183,7 @@ RTCの種類によっては，第2引数で設定した動作モードの整数�
 
 ### タイマのモード設定
 ```
-int   setTimerMode(uint8_t num, timer_mode_t * mode)
+int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 第2引数は上の``setTimer()``と同じ．
 

@@ -159,7 +159,7 @@ bool RTC_RX8900_U::getTime(date_t* time){
 /*
  * RTC情報取得
  */
-void RTC_RX8900_U::getRtcInfo(rtc_info_t *info) {
+void RTC_RX8900_U::getRtcInfo(rtc_u_info_t *info) {
   info->type=EPSON_RX8900;
   info->numOfInteruptPin=RTC_EPSON_RX8900_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_EPSON_RX8900_NUM_OF_ALARM;
@@ -319,7 +319,7 @@ int RTC_RX8900_U::setTTimerFlag(void){
  *      - useInteruptPin : コントールレジスタ 4bit目(TIE bit)に割当て (0 ピン出力なし, 1 ピン出力あり)
  *      - interval       : extentionレジスタの0,1bit目(TSEL0,1)に割当て
  */
-int RTC_RX8900_U::setTTimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_RX8900_U::setTTimer(rtc_timer_mode_t * mode, uint16_t multi) {
   uint8_t timer_counter0, timer_counter1;
   timer_counter0 = (uint8_t) multi;
   timer_counter1 = (uint8_t) ((multi >>8) & 0b00001111);
@@ -354,7 +354,7 @@ int RTC_RX8900_U::setTTimer(timer_mode_t * mode, uint16_t multi) {
  *      - useInteruptPin : コントールレジスタ 4bit目(TIE bit)に割当て (0 ピン出力なし, 1 ピン出力あり)
  *      - interval       : extentionレジスタの0,1bit目(TSEL0,1)に割当て
  */
-int RTC_RX8900_U::setTTimerMode(timer_mode_t * mode) {
+int RTC_RX8900_U::setTTimerMode(rtc_timer_mode_t * mode) {
   if (1 < mode->useInteruptPin) return RTC_U_ILLEGAL_PARAM;
   if (3 < mode->interval) return RTC_U_ILLEGAL_PARAM;
   int rst = setTTimerFlag();
@@ -422,7 +422,7 @@ int RTC_RX8900_U::setUTimerFlag(void){
  * multiは無視
  * 処理内容はsetUTimerMode()と同じなので，setUTimerMode()に任せる
  */
-int RTC_RX8900_U::setUTimer(timer_mode_t * mode, uint16_t multi) {
+int RTC_RX8900_U::setUTimer(rtc_timer_mode_t * mode, uint16_t multi) {
   return setUTimerMode(mode);
 }
 
@@ -431,7 +431,7 @@ int RTC_RX8900_U::setUTimer(timer_mode_t * mode, uint16_t multi) {
  *      - useInteruptPin : 無視
  *      - interval       : extentionレジスタの5bit目(USEL)に代入
  */
-int RTC_RX8900_U::setUTimerMode(timer_mode_t * mode) {
+int RTC_RX8900_U::setUTimerMode(rtc_timer_mode_t * mode) {
   if (3< mode->interval) return RTC_U_ILLEGAL_PARAM;
   uint8_t extensionReg;
   int rst=getRegValue(0x0D);
@@ -471,7 +471,7 @@ int RTC_RX8900_U::controlUTimer(uint8_t action) {
  *  - 1 : 定周期タイマ
  *  - 0 : カウントダウンタイマ(割り込み)
  */
-int RTC_RX8900_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
+int RTC_RX8900_U::setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi) {
   switch(num) {
     case 0 : return setTTimer(mode, multi);
     case 1 : return setUTimer(mode, multi);
@@ -484,7 +484,7 @@ int RTC_RX8900_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
  *  - 1 : 定周期タイマ
  *  - 0 : カウントダウンタイマ(割り込み)
  */
-int RTC_RX8900_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
+int RTC_RX8900_U::setTimerMode(uint8_t num, rtc_timer_mode_t * mode) {
   switch(num) {
     case 0 : return setTTimerMode(mode);
     case 1 : return setUTimerMode(mode);

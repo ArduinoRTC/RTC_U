@@ -68,12 +68,12 @@ enum{
 
 RTC_DS3231_U rtc = RTC_DS3231_U(&Wire);
 
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print(F("RTC type number            : "));Serial.println(rtcInfo->type);
   Serial.print(F("number of interupt pin     : "));Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print(F("number of Alarm            : "));Serial.println(rtcInfo->numOfAlarm);

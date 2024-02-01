@@ -87,7 +87,7 @@ public:
   bool  begin(bool init=true, uint8_t addr=RTC_RV8803_DEFAULT_ADRS);
   bool  setTime(date_t*);
   bool  getTime(date_t*);
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
 // 電源関係
   int   checkLowPower(void);
   int   clearPowerFlag(void);
@@ -107,8 +107,8 @@ public:
   int   setAlarmMode(uint8_t num, alarm_mode_t * mode);
   int   controlAlarm(uint8_t num, uint8_t action);
 // タイマ
-  int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi);
-  int   setTimerMode(uint8_t num, timer_mode_t * mode);
+  int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi);
+  int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode);
   int   controlTimer(uint8_t num, uint8_t action);
 // 外部イベント
   int   setEvent(event_mode_t *mode);
@@ -143,10 +143,10 @@ private:
   int readRegs(uint8_t addr, uint8_t *val, uint8_t len);
   int writeRegs(uint8_t addr, uint8_t *val, uint8_t len);
 
-  int   setIntervalTimer(timer_mode_t * mode);
-  int   setCountdownTimer(timer_mode_t * mode, uint16_t multi);
-  int   setIntervalTimerMode(timer_mode_t * mode);
-  int   setCountdownTimerMode(timer_mode_t * mode);
+  int   setIntervalTimer(rtc_timer_mode_t * mode);
+  int   setCountdownTimer(rtc_timer_mode_t * mode, uint16_t multi);
+  int   setIntervalTimerMode(rtc_timer_mode_t * mode);
+  int   setCountdownTimerMode(rtc_timer_mode_t * mode);
   int   controlIntervalTimer(uint8_t action);
   int   controlCountdownTimer(uint8_t action);
 

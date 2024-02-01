@@ -107,7 +107,7 @@ int checkAlarmInterupt_RV8803() {
 }
 
 int checkAlarmInterupt(){
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON8564NB:return checkAlarmInterupt_8564();

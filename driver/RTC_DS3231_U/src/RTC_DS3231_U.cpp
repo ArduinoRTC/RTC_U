@@ -9,7 +9,7 @@ RTC_DS3231_U::RTC_DS3231_U(TwoWire * theWire, int32_t id) {
   rtcID=id;
 }
 
-void RTC_DS3231_U::getRtcInfo(rtc_info_t *info){
+void RTC_DS3231_U::getRtcInfo(rtc_u_info_t *info){
   info->type=DS3231;
   info->numOfInteruptPin=RTC_DS3231_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_DS3231_NUM_OF_ALARM;

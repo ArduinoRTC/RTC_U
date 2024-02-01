@@ -83,7 +83,7 @@ DS1307のデフォルトI2Cのアドレスではない番号を持つモジュ�
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 ## 時刻関係

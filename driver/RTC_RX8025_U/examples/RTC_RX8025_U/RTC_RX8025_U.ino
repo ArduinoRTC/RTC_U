@@ -153,12 +153,12 @@ uint8_t testResults[TEST_LINE][TEST_COL];
 
 RTC_RX8025_U rtc = RTC_RX8025_U(&Wire);
 
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);
@@ -236,7 +236,7 @@ void testFreqOut(void){
  */
 void testTimer(void) {
   Serial.println("2. timer test.");
-  timer_mode_t timer;
+  rtc_timer_mode_t timer;
   Serial.println("2.1.  1 sec timer setting.");
   timer.interval=0b100; // レベルモード 秒1回
   int flag=rtc.setTimer((uint8_t)0,&timer , (uint8_t)0);

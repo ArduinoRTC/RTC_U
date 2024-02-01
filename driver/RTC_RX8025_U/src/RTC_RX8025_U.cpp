@@ -7,7 +7,7 @@ RTC_RX8025_U::RTC_RX8025_U(TwoWire * theWire, int32_t id)
   timerSetting=0xFF;
 }
 
-void RTC_RX8025_U::getRtcInfo(rtc_info_t *info){
+void RTC_RX8025_U::getRtcInfo(rtc_u_info_t *info){
   info->type=EPSON_RX8025;
   info->numOfInteruptPin=RTC_EPSON_RX8025_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_EPSON_RX8025_NUM_OF_ALARM;
@@ -342,7 +342,7 @@ int RTC_RX8025_U::controlAlarm(uint8_t num, uint8_t action){
  *    int8_t  interval;        ← ctrl1レジスタ(0x0e)の下3bitを変更
  * RX8025はmodeで設定した時間の整数倍を設定する機能はないため，multiは無意味
  */
-int RTC_RX8025_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi){
+int RTC_RX8025_U::setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi){
   if (num >= RTC_EPSON_RX8025_NUM_OF_TIMER) return RTC_U_ILLEGAL_PARAM;
   if (7< mode->interval) return RTC_U_ILLEGAL_PARAM;
   // ctrl1レジスタを読み出し
@@ -369,7 +369,7 @@ int RTC_RX8025_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi){
  * タイマがOFFの場合は，バックアップされているモードの値のみを書き換え
  * タイマがONの場合は，レジスタ値を書き換え
  */
-int RTC_RX8025_U::setTimerMode(uint8_t num, timer_mode_t * mode){
+int RTC_RX8025_U::setTimerMode(uint8_t num, rtc_timer_mode_t * mode){
   if (num >= RTC_EPSON_RX8025_NUM_OF_TIMER) return RTC_U_ILLEGAL_PARAM;
   if (7< mode->interval) return RTC_U_ILLEGAL_PARAM;
   if (0xFF!=timerSetting) { // タイマOFFの場合

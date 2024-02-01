@@ -43,7 +43,7 @@ uint8_t offsetParam[][2]={
 };
 
 int setupOffset(bool selection) {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   uint8_t offsetType;
   switch(rtcInfo.type) {

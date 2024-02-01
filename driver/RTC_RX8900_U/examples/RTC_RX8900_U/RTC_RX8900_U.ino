@@ -34,12 +34,12 @@ TEST_CLOCK
 #endif /* DEBUG */
 
 RTC_RX8900_U rtc = RTC_RX8900_U(&Wire);
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);
@@ -173,7 +173,7 @@ void testTimer(void) {
   // mode - repeat         : 無視
   //      - useInteruptPin : コントールレジスタ 4bit目(TIE bit)に割当て (0 ピン出力なし, 1 ピン出力あり)
   //      - interval       : extentionレジスタの0,1bit目(TSEL0,1)に割当て
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   // 9秒で発火するタイマ設定
   uint16_t multi=0b101000000; //   256 (counter1 - 0bit目) , 64 (counter0 - 6bit目)
   mode.interval = 0b01;     // TSEL1 = 0 , TSEC0 = 1 (64Hz)

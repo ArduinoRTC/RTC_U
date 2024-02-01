@@ -9,7 +9,7 @@ RTC_4543_U::RTC_4543_U(uint8_t _dataPin, uint8_t _clkPin, uint8_t _wrPin, uint8_
   rtcID   = _rtcID;
 }
 
-void  RTC_4543_U::getRtcInfo(rtc_info_t *info) {
+void  RTC_4543_U::getRtcInfo(rtc_u_info_t *info) {
   info->type=EPSON_4543SA;
   info->numOfInteruptPin=RTC_EPSON_4543_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_EPSON_4543_NUM_OF_ALARM;

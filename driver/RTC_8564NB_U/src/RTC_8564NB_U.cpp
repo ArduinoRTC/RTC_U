@@ -7,7 +7,7 @@ RTC_8564NB_U::RTC_8564NB_U(TwoWire * theWire, int32_t id)
   _rtcID=id;
 }
 
-void RTC_8564NB_U::getRtcInfo(rtc_info_t *info){
+void RTC_8564NB_U::getRtcInfo(rtc_u_info_t *info){
   info->type=EPSON8564NB;
   info->numOfInteruptPin=RTC_EPSON_8564NB_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_EPSON_8564NB_NUM_OF_ALARM;
@@ -181,7 +181,7 @@ int  RTC_8564NB_U::controlAlarm(uint8_t num, uint8_t action) {
  * タイマの設定
  * タイマレジスタ(0x0F)を書き換えて，モード変更の後，タイマを有効化
  */
-int  RTC_8564NB_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
+int  RTC_8564NB_U::setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi) {
   if (multi > 0xFF) return RTC_U_ILLEGAL_PARAM;
   uint8_t timerCounter_reg = (uint8_t) multi;
   if (!setRegValue(RTC_EPSON_8564NB_REG_ALARM_TIMER,timerCounter_reg)) return RTC_U_FAILURE;
@@ -203,7 +203,7 @@ int  RTC_8564NB_U::setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi) {
  *     1    1   : 1分
  *  引数modeの要素が負の場合は変更しない
  */
-int  RTC_8564NB_U::setTimerMode(uint8_t num, timer_mode_t * mode) {
+int  RTC_8564NB_U::setTimerMode(uint8_t num, rtc_timer_mode_t * mode) {
   if (num >= RTC_EPSON_8564NB_NUM_OF_TIMER) return RTC_U_ILLEGAL_PARAM;
   if (mode == NULL) return RTC_U_ILLEGAL_PARAM;
 

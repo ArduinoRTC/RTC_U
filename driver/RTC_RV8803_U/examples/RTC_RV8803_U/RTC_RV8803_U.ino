@@ -45,7 +45,7 @@ enum {
 #endif /* DEBUG */
 
 RTC_RV8803_U rtc = RTC_RV8803_U(&Wire);
-rtc_info_t rtcInfo;
+rtc_u_info_t rtcInfo;
 
 
 /*
@@ -93,7 +93,7 @@ void printInterupt(int val) {
 /*
  * RTCの機種情報をプリントアウト
  */
-void printRtcInfo(rtc_info_t * rtcInfo) {
+void printRtcInfo(rtc_u_info_t * rtcInfo) {
   Serial.print("RTC type number            : ");Serial.println(rtcInfo->type);
   Serial.print("number of interupt pin     : ");Serial.println(rtcInfo->numOfInteruptPin);
   Serial.print("number of Alarm            : ");Serial.println(rtcInfo->numOfAlarm);
@@ -878,7 +878,7 @@ void testIntervalTimer(void) {
   Serial.println("6 interval timer");
   // タイマ設定
   Serial.println(F("6.1 setup interval timer."));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=1;
   mode.interval=1;
   int rst = rtc.setTimer(0,&mode,0);
@@ -1044,7 +1044,7 @@ void testCountdownTimer(void) {
   Serial.println("7 countdown timer");
   // タイマ設定
   Serial.println(F("7.1 setup countdown timer."));
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=1; // INTピン利用
   mode.interval=0b01;    // 64Hz
   uint16_t multi= (0b00000010 << 8) | 0b01000000; // 512 + 64

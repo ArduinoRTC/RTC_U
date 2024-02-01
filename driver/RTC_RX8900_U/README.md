@@ -74,7 +74,7 @@ I2Cのアドレスにデフォルトでないものを用いる場合は
 ## RTCの情報の取得
 RTCのチップの種類や機能の情報を取得するメンバ関数．
 ```
-void  getRtcInfo(rtc_info_t *info)
+void  getRtcInfo(rtc_u_info_t *info)
 ```
 
 ## 時刻関係
@@ -146,7 +146,7 @@ RX8900はタイマが2種類あります．以下の関数の第1引数``num``�
 
 ### タイマ設定
 ```
-int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
+int   setTimer(uint8_t num, rtc_timer_mode_t * mode, uint16_t multi)
 ```
 
 | 返り値 | 意味 |
@@ -169,7 +169,7 @@ int   setTimer(uint8_t num, timer_mode_t * mode, uint16_t multi)
 
 ### タイマのモード設定
 ```
-int   setTimerMode(uint8_t num, timer_mode_t * mode)
+int   setTimerMode(uint8_t num, rtc_timer_mode_t * mode)
 ```
 
 | 返り値 | 意味 |

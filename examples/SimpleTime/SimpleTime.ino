@@ -137,7 +137,7 @@ int timeValidity_DS1307() {
 }
 
 int timeValidity(void) {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON_4543SA:return timeValidity_4543();

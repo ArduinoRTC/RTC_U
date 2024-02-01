@@ -29,27 +29,27 @@ void printTime(date_t * date){
  */
 
 int setupTimer_RX8025() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=0;  // 割り込みピン利用しない
   mode.interval=0b101;   // 1分周期(毎分0秒)
   return rtc.setTimer(0,&mode, 0xFF);
 }
 
 int setupTimer_RX8900() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.useInteruptPin=0;  // 割り込みピン利用しない
   mode.interval=1;        // 毎分0秒
   return rtc.setTimer(1,&mode, 0xFF);
 }
 
 int setupTimer_RV8803() {
-  timer_mode_t mode;
+  rtc_timer_mode_t mode;
   mode.interval=1;       // 毎分
   return rtc.setTimer(0,&mode, 0xFF);
 }
 
 int setupTimer() {
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON_RX8025:return setupTimer_RX8025();
@@ -90,7 +90,7 @@ int checkTimerInterupt_RV8803() {
 }
 
 int checkTimerInterupt(){
-  rtc_info_t rtcInfo;
+  rtc_u_info_t rtcInfo;
   rtc.getRtcInfo(&rtcInfo);
   switch(rtcInfo.type) {
     case EPSON_RX8025:return checkTimerInterupt_RX8025();

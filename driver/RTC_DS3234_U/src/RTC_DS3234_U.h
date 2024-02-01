@@ -52,7 +52,7 @@ public:
   int   controlClockOut(uint8_t num, uint8_t mode);
   int   checkInterupt(void);
   int   clearInterupt(uint16_t type);
-  void  getRtcInfo(rtc_info_t *info);
+  void  getRtcInfo(rtc_u_info_t *info);
   int   checkLowPower(void);
   int   clearPowerFlag(void);
   float getTemperature(uint8_t mode);

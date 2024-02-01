@@ -7,7 +7,7 @@ RTC_DS1307_U::RTC_DS1307_U(TwoWire * theWire, int32_t id)
   _rtcID=id;
 }
 
-void RTC_DS1307_U::getRtcInfo(rtc_info_t *info){
+void RTC_DS1307_U::getRtcInfo(rtc_u_info_t *info){
   info->type=DS1307;
   info->numOfInteruptPin=RTC_DS1307_NUM_OF_INTERUPT_PIN;
   info->numOfAlarm=RTC_DS1307_NUM_OF_ALARM;
