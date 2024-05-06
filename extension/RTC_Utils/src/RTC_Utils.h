@@ -31,13 +31,13 @@
 #include "RTC_RV8803_U.h"
 #endif /* USE_RV8803 */
 
-#ifdef USE_RX8025
-#include "RTC_RX8025_U.h"
-#endif /* USE_RX8025 */
-
 #ifdef USE_RX8900
 #include "RTC_RX8900_U.h"
 #endif /* USE_RX8900 */
+
+#ifdef USE_RX8025
+#include "RTC_RX8025_U.h"
+#endif /* USE_RX8025 */
 
 #ifdef __RTC_4543_U_H__
 #ifndef RTC_CLASS
@@ -81,17 +81,17 @@
 #endif /* RTC_CLASS */
 #endif /* __RTC_RV8803_U_H__ */
 
-#ifndef __RTC_EPSON_RX8025_U_H__
-#ifndef RTC_CLASS
-#define RTC_CLASS RTC_RX8025_U
-#endif /* RTC_CLASS */
-#endif /* __RTC_EPSON_RX8025_U_H__ */
-
-#ifndef __RTC_RX8900_U_H__
+#ifdef __RTC_RX8900_U_H__
 #ifndef RTC_CLASS
 #define RTC_CLASS RTC_RX8900_U
 #endif /* RTC_CLASS */
 #endif /* __RTC_RX8900_U_H__ */
+
+#ifdef __RTC_EPSON_RX8025_U_H__
+#ifndef RTC_CLASS
+#define RTC_CLASS RTC_RX8025_U
+#endif /* RTC_CLASS */
+#endif /* __RTC_EPSON_RX8025_U_H__ */
 
 #endif /* _RTC_UTILS_H_ */
 
